@@ -82,8 +82,6 @@ async function renderLeaderboard(){
       return;
     }
 
-    box.className='';
-
     const lichessRatings={};
 
     for(const p of data){
@@ -96,6 +94,8 @@ async function renderLeaderboard(){
         }
       }
     }
+
+    box.className='';
 
     box.innerHTML=`
       <table class="table">
@@ -139,53 +139,6 @@ async function renderLeaderboard(){
 
       <div class="notice">
         <strong>DYCHESS League</strong> — 1st = 3 points · 2nd = 2 points · 3rd = 1 point.
-      </div>
-    `;
-
-  }catch(e){
-    console.error(e);
-    box.className='empty';
-    box.innerHTML='Could not load the DYCHESS leaderboard.';
-  }
-}
-
-    box.className='';
-
-    box.innerHTML=`
-      <table class="table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Player</th>
-            <th>Points</th>
-            <th>Tournaments</th>
-            <th>🥇</th>
-            <th>🥈</th>
-            <th>🥉</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.map((p,i)=>`
-            <tr>
-              <td class="rank">${i+1}</td>
-              <td>
-                <strong>${esc(p.display_name)}</strong>
-                ${p.lichess_username
-                  ? `<div class="muted">@${esc(p.lichess_username)}</div>`
-                  : ''}
-              </td>
-              <td><strong>${p.dychess_points}</strong></td>
-              <td>${p.tournaments_played}</td>
-              <td>${p.first_place_count}</td>
-              <td>${p.second_place_count}</td>
-              <td>${p.third_place_count}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-
-      <div class="notice">
-        <strong>DYCHESS Leaderboard</strong> — 1st = 3 points · 2nd = 2 points · 3rd = 1 point.
       </div>
     `;
 

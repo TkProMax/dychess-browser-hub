@@ -61,9 +61,73 @@ function renderPlayers(data){
  const box=document.getElementById('playersGrid');
  if(!data.length){box.innerHTML='<div class="empty" style="grid-column:1/-1">No players connected yet. Add a Lichess username above.</div>';renderLeaderboard([]);return;}
  box.innerHTML=data.map(p=>{const blitz=p.perfs?.blitz?.rating||'—';const games=p.games||[];const wins=games.filter(g=>resultFor(g,p.username)[0]==='win').length;const losses=games.filter(g=>resultFor(g,p.username)[0]==='loss').length;const draws=games.filter(g=>resultFor(g,p.username)[0]==='draw').length;return `<article class="player-card"><div class="player-top"><div class="player"><div class="avatar">♟</div><div><div class="player-name">${esc(p.username)}</div><div class="handle">${p.title?esc(p.title)+' · ':''}Lichess</div></div></div><button class="remove" title="Remove player" onclick="removePlayer('${esc(p.username)}')">×</button></div><div class="rating">${esc(blitz)}</div><div class="mini">Blitz rating · ${esc(p.count?.all||0)} total games on Lichess</div><div class="stat"><span>Recent form</span><strong>${wins}W · ${draws}D · ${losses}L</strong></div><div class="stat"><span>Joined</span><strong>${fmtDate(p.createdAt)}</strong></div><a class="link" target="_blank" rel="noopener" href="https://lichess.org/@/${encodeURIComponent(p.username)}">View Lichess profile →</a><div class="game-list">${games.slice(0,3).map(g=>{const [res]=resultFor(g,p.username);const opp=(g.players?.white?.user?.name||'Anonymous')===p.username?(g.players?.black?.user?.name||'Anonymous'):(g.players?.white?.user?.name||'Anonymous');return `<div class="game"><span>vs ${esc(opp)}</span><span class="${res}">${res==='win'?'WIN':res==='loss'?'LOSS':res==='draw'?'DRAW':'—'}</span></div>`}).join('')||'<div class="muted">No recent public games.</div>'}</div></article>`}).join('');
- renderLeaderboard(data);
+ renderLeaderboard();
 }
-function renderLeaderboard(data){const box=document.getElementById('leaderboardBox');if(!data.length){box.className='empty';box.innerHTML='Connect players above to build the live leaderboard.';return}box.className='';const sorted=[...data].sort((a,b)=>(b.perfs?.blitz?.rating||0)-(a.perfs?.blitz?.rating||0));box.innerHTML=`<table class="table"><thead><tr><th>#</th><th>Player</th><th>Blitz</th><th>Rapid</th><th>Bullet</th><th>Games</th></tr></thead><tbody>${sorted.map((p,i)=>`<tr><td class="rank">${i+1}</td><td><a class="link" target="_blank" rel="noopener" href="https://lichess.org/@/${encodeURIComponent(p.username)}">${esc(p.username)}</a></td><td><strong>${p.perfs?.blitz?.rating||'—'}</strong></td><td>${p.perfs?.rapid?.rating||'—'}</td><td>${p.perfs?.bullet?.rating||'—'}</td><td>${p.count?.all||0}</td></tr>`).join('')}</tbody></table><div class="notice">This is the <strong>Lichess leaderboard</strong> view. DYCHESS's own competitive rating will be added when we connect a database and tournament-result system.</div>`}
+async function renderLeaderboard(){
+  const box=document.getElementById('leaderboardBox');
+
+  box.className='empty';
+  box.innerHTML='Loading DYCHESS leaderboard…';
+
+  try{
+    const {data,error}=await window.dychessDB
+      .from('dychess_leaderboard')
+      .select('*');
+
+    if(error) throw error;
+
+    if(!data || !data.length){
+      box.className='empty';
+      box.innerHTML='No DYCHESS players yet.';
+      return;
+    }
+
+    box.className='';
+
+    box.innerHTML=`
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Points</th>
+            <th>Tournaments</th>
+            <th>🥇</th>
+            <th>🥈</th>
+            <th>🥉</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map((p,i)=>`
+            <tr>
+              <td class="rank">${i+1}</td>
+              <td>
+                <strong>${esc(p.display_name)}</strong>
+                ${p.lichess_username
+                  ? `<div class="muted">@${esc(p.lichess_username)}</div>`
+                  : ''}
+              </td>
+              <td><strong>${p.dychess_points}</strong></td>
+              <td>${p.tournaments_played}</td>
+              <td>${p.first_place_count}</td>
+              <td>${p.second_place_count}</td>
+              <td>${p.third_place_count}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <div class="notice">
+        <strong>DYCHESS Leaderboard</strong> — 1st = 3 points · 2nd = 2 points · 3rd = 1 point.
+      </div>
+    `;
+
+  }catch(e){
+    console.error(e);
+    box.className='empty';
+    box.innerHTML='Could not load the DYCHESS leaderboard.';
+  }
+}
 async function refreshPlayers(){
   document.getElementById('playersGrid').innerHTML='<div class="empty" style="grid-column:1/-1">Loading live Lichess profiles…</div>';
 

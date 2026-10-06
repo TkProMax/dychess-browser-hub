@@ -56,7 +56,53 @@ function renderPlayers(data){
 }
 function renderLeaderboard(data){const box=document.getElementById('leaderboardBox');if(!data.length){box.className='empty';box.innerHTML='Connect players above to build the live leaderboard.';return}box.className='';const sorted=[...data].sort((a,b)=>(b.perfs?.blitz?.rating||0)-(a.perfs?.blitz?.rating||0));box.innerHTML=`<table class="table"><thead><tr><th>#</th><th>Player</th><th>Blitz</th><th>Rapid</th><th>Bullet</th><th>Games</th></tr></thead><tbody>${sorted.map((p,i)=>`<tr><td class="rank">${i+1}</td><td><a class="link" target="_blank" rel="noopener" href="https://lichess.org/@/${encodeURIComponent(p.username)}">${esc(p.username)}</a></td><td><strong>${p.perfs?.blitz?.rating||'—'}</strong></td><td>${p.perfs?.rapid?.rating||'—'}</td><td>${p.perfs?.bullet?.rating||'—'}</td><td>${p.count?.all||0}</td></tr>`).join('')}</tbody></table><div class="notice">This is the <strong>Lichess leaderboard</strong> view. DYCHESS's own competitive rating will be added when we connect a database and tournament-result system.</div>`}
 async function refreshPlayers(){document.getElementById('playersGrid').innerHTML='<div class="empty" style="grid-column:1/-1">Loading live Lichess profiles…</div>';const results=[];for(const u of players){try{results.push(await loadPlayer(u))}catch(e){console.warn(e)}}renderPlayers(results)}
-async function addPlayer(username){const clean=username.trim().replace(/^@/,'');if(!clean)return;const status=document.getElementById('connectStatus');status.textContent='Checking Lichess…';try{const p=await loadPlayer(clean);if(!players.some(x=>x.toLowerCase()===p.username.toLowerCase()))players.push(p.username);save();status.textContent=`Connected @${p.username}.`;await refreshPlayers()}catch(e){status.textContent=e.message;status.style.color='var(--danger)'}}
+async function addPlayer(username){
+  const clean=username.trim().replace(/^@/,'');
+  if(!clean)return;
+
+  const status=document.getElementById('connectStatus');
+  status.textContent='Checking Lichess…';
+  status.style.color='';
+
+  try{
+    const p=await loadPlayer(clean);
+
+    if(!players.some(x=>x.toLowerCase()===p.username.toLowerCase())){
+      players.push(p.username);
+      save();
+    }
+
+    const { data: existing, error: findError } =
+      await window.dychessDB
+        .from('players')
+        .select('id')
+        .eq('lichess_username',p.username)
+        .maybeSingle();
+
+    if(findError) throw findError;
+
+    if(!existing){
+      const { error: insertError } =
+        await window.dychessDB
+          .from('players')
+          .insert({
+            display_name:p.username,
+            lichess_username:p.username,
+            lichess_id:p.id || null
+          });
+
+      if(insertError) throw insertError;
+    }
+
+    status.textContent=`Connected @${p.username}.`;
+    await refreshPlayers();
+
+  }catch(e){
+    console.error(e);
+    status.textContent=e.message || 'Could not connect player.';
+    status.style.color='var(--danger)';
+  }
+}
 function removePlayer(username){players=players.filter(x=>x.toLowerCase()!==username.toLowerCase());save();refreshPlayers()}
 window.removePlayer=removePlayer;
 document.getElementById('playerForm').addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('username');addPlayer(input.value);input.value=''});

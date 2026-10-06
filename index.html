@@ -84,6 +84,73 @@ async function renderLeaderboard(){
 
     box.className='';
 
+    const lichessRatings={};
+
+    for(const p of data){
+      if(p.lichess_username){
+        try{
+          const user=await getUser(p.lichess_username);
+          lichessRatings[p.lichess_username]=user.perfs?.blitz?.rating || '—';
+        }catch(e){
+          lichessRatings[p.lichess_username]='—';
+        }
+      }
+    }
+
+    box.innerHTML=`
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Lichess Blitz</th>
+            <th>Played</th>
+            <th>DYCHESS Points</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${data.map((p,i)=>`
+            <tr>
+              <td class="rank">${i+1}</td>
+
+              <td>
+                <strong>${esc(p.display_name)}</strong>
+                ${p.lichess_username
+                  ? `<div class="muted">@${esc(p.lichess_username)}</div>`
+                  : ''}
+              </td>
+
+              <td>
+                <strong>${p.lichess_username
+                  ? lichessRatings[p.lichess_username]
+                  : '—'}</strong>
+              </td>
+
+              <td>${p.tournaments_played}</td>
+
+              <td>
+                <strong>${p.dychess_points}</strong>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <div class="notice">
+        <strong>DYCHESS League</strong> — 1st = 3 points · 2nd = 2 points · 3rd = 1 point.
+      </div>
+    `;
+
+  }catch(e){
+    console.error(e);
+    box.className='empty';
+    box.innerHTML='Could not load the DYCHESS leaderboard.';
+  }
+}
+
+    box.className='';
+
     box.innerHTML=`
       <table class="table">
         <thead>

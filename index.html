@@ -66,7 +66,7 @@ refreshPlayers();loadTournaments();
   const SUPABASE_URL = "https://puogdezkkgcgaxyzofoe.supabase.co";
 const SUPABASE_KEY = "sb_publishable_cKWMrNF-V40TZpdQp-ln6g_UvwbINQy";
 
-const supabase = window.supabase.createClient(
+const dychessDB = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );

@@ -55,7 +55,40 @@ function renderPlayers(data){
  renderLeaderboard(data);
 }
 function renderLeaderboard(data){const box=document.getElementById('leaderboardBox');if(!data.length){box.className='empty';box.innerHTML='Connect players above to build the live leaderboard.';return}box.className='';const sorted=[...data].sort((a,b)=>(b.perfs?.blitz?.rating||0)-(a.perfs?.blitz?.rating||0));box.innerHTML=`<table class="table"><thead><tr><th>#</th><th>Player</th><th>Blitz</th><th>Rapid</th><th>Bullet</th><th>Games</th></tr></thead><tbody>${sorted.map((p,i)=>`<tr><td class="rank">${i+1}</td><td><a class="link" target="_blank" rel="noopener" href="https://lichess.org/@/${encodeURIComponent(p.username)}">${esc(p.username)}</a></td><td><strong>${p.perfs?.blitz?.rating||'—'}</strong></td><td>${p.perfs?.rapid?.rating||'—'}</td><td>${p.perfs?.bullet?.rating||'—'}</td><td>${p.count?.all||0}</td></tr>`).join('')}</tbody></table><div class="notice">This is the <strong>Lichess leaderboard</strong> view. DYCHESS's own competitive rating will be added when we connect a database and tournament-result system.</div>`}
-async function refreshPlayers(){document.getElementById('playersGrid').innerHTML='<div class="empty" style="grid-column:1/-1">Loading live Lichess profiles…</div>';const results=[];for(const u of players){try{results.push(await loadPlayer(u))}catch(e){console.warn(e)}}renderPlayers(results)}
+async function refreshPlayers(){
+  document.getElementById('playersGrid').innerHTML='<div class="empty" style="grid-column:1/-1">Loading live Lichess profiles…</div>';
+
+  try{
+    const {data:dbPlayers,error}=await window.dychessDB
+      .from('players')
+      .select('lichess_username')
+      .not('lichess_username','is',null);
+
+    if(error) throw error;
+
+    const usernames=dbPlayers.map(p=>p.lichess_username).filter(Boolean);
+
+    players=usernames;
+    save();
+
+    const results=[];
+
+    for(const u of usernames){
+      try{
+        results.push(await loadPlayer(u));
+      }catch(e){
+        console.warn(e);
+      }
+    }
+
+    renderPlayers(results);
+
+  }catch(e){
+    console.error(e);
+    document.getElementById('playersGrid').innerHTML=
+      '<div class="empty" style="grid-column:1/-1">Could not load players from DYCHESS database.</div>';
+  }
+}
 async function addPlayer(username){
   const clean=username.trim().replace(/^@/,'');
   if(!clean)return;

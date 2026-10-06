@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+const SUPABASE_URL = "https://puogdezkkgcgaxyzofoe.supabase.co";
+const SUPABASE_KEY = "sb_publishable_cKWMrNF-V40TZpdQp-ln6g_UvwbINQy";
+
+window.dychessDB = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>DYCHESS — Develop Your Chess</title>
 <style>
@@ -144,14 +153,6 @@ refreshPlayers();loadTournaments();
 </script>
  </script>
 
-<script>
-const SUPABASE_URL = "https://puogdezkkgcgaxyzofoe.supabase.co";
-const SUPABASE_KEY = "sb_publishable_cKWMrNF-V40TZpdQp-ln6g_UvwbINQy";
 
-window.dychessDB = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-</script>
 
 </body></html>

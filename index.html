@@ -60,6 +60,25 @@ async function loadPlayer(username){
   return {...user,games:[]};
 }
 
+async function renderLeaderboard(){
+  const box=document.getElementById('leaderboardBox');
+
+  box.className='';
+  box.innerHTML='Loading DYCHESS leaderboard…';
+
+  try{
+    const {data,error}=await window.dychessDB
+      .from('dychess_leaderboard')
+      .select('*');
+
+    if(error) throw error;
+
+    if(!data || !data.length){
+      box.className='empty';
+      box.innerHTML='No DYCHESS players yet.';
+      return;
+    }
+
     box.innerHTML=`
       <table class="table">
         <thead>
@@ -126,6 +145,7 @@ async function loadPlayer(username){
     box.innerHTML='Could not load the DYCHESS leaderboard.';
   }
 }
+
 async function refreshPlayers(){
   const box=document.getElementById('playersGrid');
 

@@ -42,6 +42,9 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
 const API='https://lichess.org/api';
 const key='dychess.lichess.players.v1';
 let players=JSON.parse(localStorage.getItem(key)||'[]').filter(x=>typeof x==='string'&&x.trim());
+  function save(){
+  localStorage.setItem(key,JSON.stringify(players));
+}
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const fmtDate=x=>x?new Date(x).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}):'—';
 async function getUser(username){

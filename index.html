@@ -133,8 +133,14 @@ async function renderLeaderboard(){
       </div>
     `;
 
-    for(const p of data){
-      if(!p.lichess_username) continue;
+    /*
+      Load Lichess ratings separately.
+      A slow or rate-limited Lichess request
+      will NOT stop the leaderboard from displaying.
+    */
+
+    data.forEach(async p=>{
+      if(!p.lichess_username) return;
 
       try{
         const user=await getUser(p.lichess_username);
@@ -142,96 +148,19 @@ async function renderLeaderboard(){
         const cell=document.getElementById(`rating-${p.id}`);
 
         if(cell) cell.textContent=rating;
+
       }catch(e){
         const cell=document.getElementById(`rating-${p.id}`);
+
         if(cell) cell.textContent='—';
       }
-    }
+    });
 
   }catch(e){
     console.error(e);
     box.className='empty';
     box.innerHTML='Could not load the DYCHESS leaderboard.';
   }
-}
-function renderPlayers(data){
-  const box=document.getElementById('playersGrid');
-
-  if(!data.length){
-    box.innerHTML='<div class="empty" style="grid-column:1/-1">No players connected yet. Add a Lichess username above.</div>';
-    renderLeaderboard();
-    return;
-  }
-
-  box.innerHTML=data.map(p=>{
-    const blitz=p.perfs?.blitz?.rating||'—';
-    const games=p.games||[];
-
-    const wins=games.filter(g=>resultFor(g,p.username)[0]==='win').length;
-    const losses=games.filter(g=>resultFor(g,p.username)[0]==='loss').length;
-    const draws=games.filter(g=>resultFor(g,p.username)[0]==='draw').length;
-
-    return `
-      <article class="player-card">
-        <div class="player-top">
-          <div class="player">
-            <div class="avatar">♟</div>
-            <div>
-              <div class="player-name">${esc(p.username)}</div>
-              <div class="handle">${p.title?esc(p.title)+' · ':''}Lichess</div>
-            </div>
-          </div>
-
-          <button class="remove" title="Remove player" onclick="removePlayer('${esc(p.username)}')">×</button>
-        </div>
-
-        <div class="rating">${esc(blitz)}</div>
-
-        <div class="mini">
-          Blitz rating · ${esc(p.count?.all||0)} total games on Lichess
-        </div>
-
-        <div class="stat">
-          <span>Recent form</span>
-          <strong>${wins}W · ${draws}D · ${losses}L</strong>
-        </div>
-
-        <div class="stat">
-          <span>Joined</span>
-          <strong>${fmtDate(p.createdAt)}</strong>
-        </div>
-
-        <a class="link" target="_blank" rel="noopener"
-           href="https://lichess.org/@/${encodeURIComponent(p.username)}">
-          View Lichess profile →
-        </a>
-
-        <div class="game-list">
-          ${games.slice(0,3).map(g=>{
-            const [res]=resultFor(g,p.username);
-
-            const opp=
-              (g.players?.white?.user?.name||'Anonymous')===p.username
-                ? (g.players?.black?.user?.name||'Anonymous')
-                : (g.players?.white?.user?.name||'Anonymous');
-
-            return `
-              <div class="game">
-                <span>vs ${esc(opp)}</span>
-                <span class="${res}">
-                  ${res==='win'?'WIN':
-                    res==='loss'?'LOSS':
-                    res==='draw'?'DRAW':'—'}
-                </span>
-              </div>
-            `;
-          }).join('') || '<div class="muted">No recent public games.</div>'}
-        </div>
-      </article>
-    `;
-  }).join('');
-
-  renderLeaderboard();
 }
 
 async function refreshPlayers(){

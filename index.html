@@ -66,7 +66,7 @@ function renderPlayers(data){
 async function renderLeaderboard(){
   const box=document.getElementById('leaderboardBox');
 
-  box.className='empty';
+  box.className='';
   box.innerHTML='Loading DYCHESS leaderboard…';
 
   try{
@@ -81,21 +81,6 @@ async function renderLeaderboard(){
       box.innerHTML='No DYCHESS players yet.';
       return;
     }
-
-    const lichessRatings={};
-
-    for(const p of data){
-      if(p.lichess_username){
-        try{
-          const user=await getUser(p.lichess_username);
-          lichessRatings[p.lichess_username]=user.perfs?.blitz?.rating || '—';
-        }catch(e){
-          lichessRatings[p.lichess_username]='—';
-        }
-      }
-    }
-
-    box.className='';
 
     box.innerHTML=`
       <table class="table">
@@ -122,9 +107,9 @@ async function renderLeaderboard(){
               </td>
 
               <td>
-                <strong>${p.lichess_username
-                  ? lichessRatings[p.lichess_username]
-                  : '—'}</strong>
+                <strong id="rating-${p.id}">
+                  ${p.lichess_username ? 'Loading…' : '—'}
+                </strong>
               </td>
 
               <td>${p.tournaments_played}</td>
@@ -141,6 +126,21 @@ async function renderLeaderboard(){
         <strong>DYCHESS League</strong> — 1st = 3 points · 2nd = 2 points · 3rd = 1 point.
       </div>
     `;
+
+    for(const p of data){
+      if(!p.lichess_username) continue;
+
+      try{
+        const user=await getUser(p.lichess_username);
+        const rating=user.perfs?.blitz?.rating || '—';
+        const cell=document.getElementById(`rating-${p.id}`);
+
+        if(cell) cell.textContent=rating;
+      }catch(e){
+        const cell=document.getElementById(`rating-${p.id}`);
+        if(cell) cell.textContent='—';
+      }
+    }
 
   }catch(e){
     console.error(e);

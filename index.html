@@ -149,7 +149,9 @@ async function renderLeaderboard(){
   }
 }
 async function refreshPlayers(){
-  document.getElementById('playersGrid').innerHTML='<div class="empty" style="grid-column:1/-1">Loading live Lichess profiles…</div>';
+  const box=document.getElementById('playersGrid');
+
+  box.innerHTML='<div class="empty" style="grid-column:1/-1">Loading DYCHESS players…</div>';
 
   try{
     const {data:dbPlayers,error}=await window.dychessDB
@@ -159,20 +161,71 @@ async function refreshPlayers(){
 
     if(error) throw error;
 
-    const usernames=dbPlayers.map(p=>p.lichess_username).filter(Boolean);
+    const usernames=[...new Set(
+      dbPlayers
+        .map(p=>p.lichess_username)
+        .filter(Boolean)
+    )];
 
     players=usernames;
     save();
 
-    const results=[];
-
-    for(const u of usernames){
-      try{
-        results.push(await loadPlayer(u));
-      }catch(e){
-        console.warn(e);
-      }
+    if(!usernames.length){
+      renderPlayers([]);
+      return;
     }
+
+    /*
+      Show the page immediately.
+      Lichess information will fill in afterward.
+    */
+    box.innerHTML='';
+
+    for(const username of usernames){
+      const card=document.createElement('article');
+      card.className='player-card';
+      card.innerHTML=`
+        <div class="player-top">
+          <div class="player">
+            <div class="avatar">♟</div>
+            <div>
+              <div class="player-name">${esc(username)}</div>
+              <div class="handle">Loading Lichess profile…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rating">—</div>
+        <div class="mini">Loading player information…</div>
+      `;
+
+      box.appendChild(card);
+    }
+
+    /*
+      Load Lichess profiles after the player cards
+      are already visible.
+    */
+   const results=await Promise.all(
+  usernames.map(async username=>{
+    try{
+      return await loadPlayer(username);
+    }catch(e){
+      console.warn('Could not load',username,e);
+      return null;
+    }
+  })
+);
+
+renderPlayers(results.filter(Boolean));
+
+  }catch(e){
+    console.error(e);
+
+    box.innerHTML=
+      '<div class="empty" style="grid-column:1/-1">Could not load players from DYCHESS database.</div>';
+  }
+}
 
     renderPlayers(results);
 

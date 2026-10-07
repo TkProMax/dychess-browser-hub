@@ -225,14 +225,7 @@ renderPlayers(results.filter(Boolean));
   }
 }
 
-    renderPlayers(results);
 
-  }catch(e){
-    console.error(e);
-    document.getElementById('playersGrid').innerHTML=
-      '<div class="empty" style="grid-column:1/-1">Could not load players from DYCHESS database.</div>';
-  }
-}
 async function addPlayer(username){
   const clean=username.trim().replace(/^@/,'');
   if(!clean)return;

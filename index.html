@@ -92,6 +92,67 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
   </button>
 
   <div id="adminTournamentStatus" class="status"></div>
+  <h3 style="margin-top:28px">Edit Tournament</h3>
+
+<div style="display:grid;gap:12px;margin-top:18px">
+
+  <select
+    id="editTournamentSelect"
+    class="input"
+  >
+    <option value="">Select tournament</option>
+  </select>
+
+  <input
+    id="editTournamentName"
+    class="input"
+    type="text"
+    placeholder="Tournament name"
+  >
+
+  <input
+    id="editTournamentDate"
+    class="input"
+    type="date"
+  >
+
+  <input
+    id="editTournamentTime"
+    class="input"
+    type="time"
+  >
+
+  <input
+    id="editTournamentUrl"
+    class="input"
+    type="url"
+    placeholder="Lichess tournament URL"
+  >
+
+  <input
+    id="editTournamentFormat"
+    class="input"
+    type="text"
+    placeholder="Format (e.g. Swiss, Blitz)"
+  >
+
+  <textarea
+    id="editTournamentDescription"
+    class="input"
+    placeholder="Tournament description"
+    rows="3"
+  ></textarea>
+
+  <button
+    class="btn btn-primary"
+    onclick="updateTournament()"
+  >
+    Save Tournament Changes
+  </button>
+
+  <div id="editTournamentStatus" class="status"></div>
+
+</div>
 
 </div>
       </div>
@@ -149,6 +210,7 @@ async function adminLogin(){
     }
 
     alert('DYCHESS Admin login successful.');
+    await loadAdminTournaments();
     document.getElementById('adminPanel').style.display='block';
 
   }catch(e){
@@ -203,6 +265,98 @@ async function createTournament(){
   }catch(e){
     console.error(e);
     status.textContent=e.message || 'Could not create tournament.';
+    status.style.color='var(--danger)';
+  }
+}
+async function loadAdminTournaments(){
+  const select=document.getElementById('editTournamentSelect');
+
+  try{
+    const {data,error}=await window.dychessDB
+      .from('tournaments')
+      .select('*')
+      .order('tournament_date',{ascending:true})
+      .order('tournament_time',{ascending:true});
+
+    if(error) throw error;
+
+    select.innerHTML='<option value="">Select tournament</option>';
+
+    (data || []).forEach(t=>{
+      const option=document.createElement('option');
+      option.value=t.id;
+      option.textContent=t.name;
+      select.appendChild(option);
+    });
+
+    select.onchange=()=>{
+      const t=(data || []).find(x=>String(x.id)===select.value);
+
+      if(!t)return;
+
+      document.getElementById('editTournamentName').value=t.name || '';
+      document.getElementById('editTournamentDate').value=t.tournament_date || '';
+      document.getElementById('editTournamentTime').value=t.tournament_time ? t.tournament_time.slice(0,5) : '';
+      document.getElementById('editTournamentUrl').value=t.lichess_url || '';
+      document.getElementById('editTournamentFormat').value=t.format || '';
+      document.getElementById('editTournamentDescription').value=t.description || '';
+    };
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+
+async function updateTournament(){
+  const id=document.getElementById('editTournamentSelect').value;
+  const name=document.getElementById('editTournamentName').value.trim();
+  const date=document.getElementById('editTournamentDate').value;
+  const time=document.getElementById('editTournamentTime').value;
+  const format=document.getElementById('editTournamentFormat').value.trim();
+  const description=document.getElementById('editTournamentDescription').value.trim();
+  const lichessUrl=document.getElementById('editTournamentUrl').value.trim();
+  const status=document.getElementById('editTournamentStatus');
+
+  if(!id){
+    status.textContent='Please select a tournament.';
+    status.style.color='var(--danger)';
+    return;
+  }
+
+  if(!name || !date || !time){
+    status.textContent='Please enter a tournament name, date and time.';
+    status.style.color='var(--danger)';
+    return;
+  }
+
+  status.textContent='Saving changes…';
+  status.style.color='';
+
+  try{
+    const {data,error}=await window.dychessDB.rpc(
+      'update_tournament',
+      {
+        p_id:Number(id),
+        p_name:name,
+        p_tournament_date:date,
+        p_tournament_time:time,
+        p_format:format || null,
+        p_description:description || null,
+        p_lichess_url:lichessUrl || null
+      }
+    );
+
+    if(error) throw error;
+
+    status.textContent='Tournament updated successfully.';
+
+    await loadAdminTournaments();
+    await loadDychessTournaments();
+
+  }catch(e){
+    console.error(e);
+    status.textContent=e.message || 'Could not update tournament.';
     status.style.color='var(--danger)';
   }
 }

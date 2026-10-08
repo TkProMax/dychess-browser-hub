@@ -144,6 +144,50 @@ async function adminLogin(){
     alert(e.message || 'Admin login failed.');
   }
 }
+async function createTournament(){
+  const name=document.getElementById('adminTournamentName').value.trim();
+  const date=document.getElementById('adminTournamentDate').value;
+  const format=document.getElementById('adminTournamentFormat').value.trim();
+  const description=document.getElementById('adminTournamentDescription').value.trim();
+  const status=document.getElementById('adminTournamentStatus');
+
+  status.textContent='Creating tournament…';
+  status.style.color='';
+
+  if(!name || !date){
+    status.textContent='Please enter a tournament name and date.';
+    status.style.color='var(--danger)';
+    return;
+  }
+
+  try{
+    const {data,error}=await window.dychessDB.rpc(
+      'create_tournament',
+      {
+        p_name:name,
+        p_tournament_date:date,
+        p_format:format || null,
+        p_description:description || null
+      }
+    );
+
+    if(error) throw error;
+
+    status.textContent='Tournament created successfully.';
+    
+    document.getElementById('adminTournamentName').value='';
+    document.getElementById('adminTournamentDate').value='';
+    document.getElementById('adminTournamentFormat').value='';
+    document.getElementById('adminTournamentDescription').value='';
+
+    console.log('Created tournament:',data);
+
+  }catch(e){
+    console.error(e);
+    status.textContent=e.message || 'Could not create tournament.';
+    status.style.color='var(--danger)';
+  }
+}
 const API='https://lichess.org/api';
 const key='dychess.lichess.players.v1';
 let players=JSON.parse(localStorage.getItem(key)||'[]').filter(x=>typeof x==='string'&&x.trim());

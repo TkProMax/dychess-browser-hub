@@ -159,7 +159,7 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
     </div>
   </div>
 </section>
-<section class="section">
+<section class="section" id="adminResultsPanel" style="display:none">
   <div class="container">
     <div class="section-head">
       <div>
@@ -255,6 +255,7 @@ async function adminLogin(){
     alert('DYCHESS Admin login successful.');
     await loadAdminTournaments();
     document.getElementById('adminPanel').style.display='block';
+    document.getElementById('adminResultsPanel').style.display='block';
 
   }catch(e){
     console.error(e);

@@ -159,6 +159,49 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
     </div>
   </div>
 </section>
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h2>Enter Tournament Results</h2>
+        <p>Add finishing positions for a DYCHESS tournament.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-card">
+
+        <select id="resultTournamentSelect" class="input">
+          <option value="">Select tournament</option>
+        </select>
+
+        <select id="resultPlayerSelect" class="input" style="margin-top:12px">
+          <option value="">Select player</option>
+        </select>
+
+        <input
+          id="resultPosition"
+          class="input"
+          type="number"
+          min="1"
+          placeholder="Finishing position"
+          style="margin-top:12px"
+        >
+
+        <button
+          class="btn btn-primary"
+          onclick="addTournamentResult()"
+          style="margin-top:12px"
+        >
+          Add Result
+        </button>
+
+        <div id="resultStatus" class="status"></div>
+
+      </div>
+    </div>
+  </div>
+</section>
 <section class="hero"><div class="container hero-grid"><div><div class="kicker">The DYCHESS Browser Hub</div><h1>Your chess. Your community. Your legacy.</h1><p>DYCHESS now pulls live public player, game and tournament information directly from Lichess.</p><div class="actions"><a class="btn btn-primary" href="#players">Connect a Player</a><a class="btn btn-light" href="#tournaments">Live Tournaments</a></div></div><div class="board" aria-label="Decorative chessboard"><script>for(let i=0;i<64;i++)document.write('<div></div>');</script></div></div></section>
 <section class="section" id="news"><div class="container"><div class="section-head"><div><h2>Latest DYCHESS</h2><p>Announcements and community stories.</p></div></div><div class="cards"><div class="card"><div class="card-icon">📢</div><h3>Community News</h3><p><strong>Next DYCHESS Swiss Tournament</strong><br>📅 Friday, October 9</p></div><div class="card"><div class="card-icon">⚔️</div><h3>Featured Matches</h3><p>Big games and rivalries get their own spotlight.</p></div><div class="card"><div class="card-icon">🎖️</div><h3>Achievements</h3><p>Celebrate milestones and standout performances.</p></div><div class="card"><div class="card-icon">📚</div><h3>Chess Content</h3><p>Lessons, puzzles and useful chess resources can come later.</p></div></div></div></section>
 <section class="section" id="hall"><div class="container"><div class="section-head"><div><h2>Hall of Fame</h2><p>DYCHESS champions and historic match winners.</p></div></div><div class="feature"><div class="feature-card"><span class="badge">👑 SEASON 1</span><h3>Winnie54321</h3><p style="color:var(--muted)">Season 1 Champion</p></div><div class="feature-card"><span class="badge">🏆 LEGENDS MATCH</span><h3>SirAyula</h3><p style="color:var(--muted)">Legends Match Winner</p></div></div></div></section>

@@ -41,10 +41,47 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
     <div class="feature">
       <div class="feature-card">
         <span class="badge">🔐 ADMIN</span>
-        <h3>Tournament Management</h3>
-        <p style="color:var(--muted)">
-          Admin controls will appear here.
-        </p>
+       <h3>Create Tournament</h3>
+
+<div style="display:grid;gap:12px;margin-top:18px">
+
+  <input
+    id="adminTournamentName"
+    class="input"
+    type="text"
+    placeholder="Tournament name"
+  >
+
+  <input
+    id="adminTournamentDate"
+    class="input"
+    type="date"
+  >
+
+  <input
+    id="adminTournamentFormat"
+    class="input"
+    type="text"
+    placeholder="Format (e.g. Swiss, Blitz)"
+  >
+
+  <textarea
+    id="adminTournamentDescription"
+    class="input"
+    placeholder="Tournament description"
+    rows="3"
+  ></textarea>
+
+  <button
+    class="btn btn-primary"
+    onclick="createTournament()"
+  >
+    Create Tournament
+  </button>
+
+  <div id="adminTournamentStatus" class="status"></div>
+
+</div>
       </div>
     </div>
   </div>

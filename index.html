@@ -57,6 +57,18 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
     class="input"
     type="date"
   >
+  <input
+  id="adminTournamentTime"
+  class="input"
+  type="time"
+  >
+
+<input
+  id="adminTournamentUrl"
+  class="input"
+  type="url"
+  placeholder="Lichess tournament URL"
+  >
 
   <input
     id="adminTournamentFormat"
@@ -147,15 +159,17 @@ async function adminLogin(){
 async function createTournament(){
   const name=document.getElementById('adminTournamentName').value.trim();
   const date=document.getElementById('adminTournamentDate').value;
+  const time=document.getElementById('adminTournamentTime').value;
   const format=document.getElementById('adminTournamentFormat').value.trim();
   const description=document.getElementById('adminTournamentDescription').value.trim();
+  const lichessUrl=document.getElementById('adminTournamentUrl').value.trim();
   const status=document.getElementById('adminTournamentStatus');
 
   status.textContent='Creating tournament…';
   status.style.color='';
 
-  if(!name || !date){
-    status.textContent='Please enter a tournament name and date.';
+  if(!name || !date || !time){
+    status.textContent='Please enter a tournament name, date and time.';
     status.style.color='var(--danger)';
     return;
   }
@@ -166,19 +180,23 @@ async function createTournament(){
       {
         p_name:name,
         p_tournament_date:date,
+        p_tournament_time:time,
         p_format:format || null,
-        p_description:description || null
+        p_description:description || null,
+        p_lichess_url:lichessUrl || null
       }
     );
 
     if(error) throw error;
 
     status.textContent='Tournament created successfully.';
-    
+
     document.getElementById('adminTournamentName').value='';
     document.getElementById('adminTournamentDate').value='';
+    document.getElementById('adminTournamentTime').value='';
     document.getElementById('adminTournamentFormat').value='';
     document.getElementById('adminTournamentDescription').value='';
+    document.getElementById('adminTournamentUrl').value='';
 
     console.log('Created tournament:',data);
 

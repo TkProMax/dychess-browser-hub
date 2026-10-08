@@ -207,6 +207,67 @@ async function createTournament(){
   }
 }
 const API='https://lichess.org/api';
+async function loadDychessTournaments(){
+  const box=document.getElementById('tournamentsBox');
+
+  box.innerHTML='<div class="empty">Loading DYCHESS tournaments…</div>';
+
+  try{
+    const {data,error}=await window.dychessDB
+      .from('tournaments')
+      .select('*')
+      .order('tournament_date',{ascending:true})
+      .order('tournament_time',{ascending:true});
+
+    if(error) throw error;
+
+    if(!data || !data.length){
+      box.innerHTML='<div class="empty">No DYCHESS tournaments scheduled yet.</div>';
+      return;
+    }
+
+    box.innerHTML=data.map(t=>{
+      const date=t.tournament_date
+        ? new Date(t.tournament_date+'T00:00:00').toLocaleDateString('en-NG',{
+            weekday:'long',
+            day:'numeric',
+            month:'long',
+            year:'numeric'
+          })
+        : 'Date TBA';
+
+      const time=t.tournament_time
+        ? t.tournament_time.slice(0,5)
+        : 'Time TBA';
+
+      return `
+        <div class="feature-card">
+          <span class="badge">${t.status==='upcoming'?'UPCOMING':'DYCHESS'}</span>
+          <h3>${esc(t.name)}</h3>
+
+          <p style="color:var(--muted)">
+            📅 ${date}<br>
+            🕗 ${time} UTC+1<br>
+            ♟ ${esc(t.format || 'Format TBA')}
+          </p>
+
+          ${t.description
+            ? `<p>${esc(t.description)}</p>`
+            : ''}
+
+          ${t.lichess_url
+            ? `<a class="btn btn-primary" href="${esc(t.lichess_url)}" target="_blank" rel="noopener">Join Tournament</a>`
+            : ''}
+        </div>
+      `;
+    }).join('');
+
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<div class="empty">Could not load DYCHESS tournaments.</div>';
+  }
+}
+loadDychessTournaments();
 const key='dychess.lichess.players.v1';
 let players=JSON.parse(localStorage.getItem(key)||'[]').filter(x=>typeof x==='string'&&x.trim());
   function save(){

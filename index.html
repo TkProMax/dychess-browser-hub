@@ -404,6 +404,95 @@ async function updateTournament(){
   }
 }
 const API='https://lichess.org/api';
+async function loadResultTournaments(){
+  const select=document.getElementById('resultTournamentSelect');
+
+  try{
+    const {data,error}=await window.dychessDB
+      .from('tournaments')
+      .select('id,name')
+      .order('tournament_date',{ascending:true});
+
+    if(error) throw error;
+
+    select.innerHTML='<option value="">Select tournament</option>';
+
+    (data || []).forEach(t=>{
+      const option=document.createElement('option');
+      option.value=t.id;
+      option.textContent=t.name;
+      select.appendChild(option);
+    });
+
+  }catch(e){
+    console.error(e);
+  }
+}
+async function loadResultPlayers(){
+  const select=document.getElementById('resultPlayerSelect');
+
+  try{
+    const {data,error}=await window.dychessDB
+      .from('players')
+      .select('id,display_name,lichess_username')
+      .order('display_name',{ascending:true});
+
+    if(error) throw error;
+
+    select.innerHTML='<option value="">Select player</option>';
+
+    (data || []).forEach(p=>{
+      const option=document.createElement('option');
+      option.value=p.id;
+      option.textContent=p.display_name || p.lichess_username;
+      select.appendChild(option);
+    });
+
+  }catch(e){
+    console.error(e);
+  }
+}
+async function addTournamentResult(){
+  const tournamentId=document.getElementById('resultTournamentSelect').value;
+  const playerId=document.getElementById('resultPlayerSelect').value;
+  const position=document.getElementById('resultPosition').value;
+  const status=document.getElementById('resultStatus');
+
+  if(!tournamentId || !playerId || !position){
+    status.textContent='Please select a tournament, player and finishing position.';
+    status.style.color='var(--danger)';
+    return;
+  }
+
+  status.textContent='Saving result…';
+  status.style.color='';
+
+  try{
+    const {error}=await window.dychessDB
+      .from('tournament_results')
+      .insert({
+        tournament_id:Number(tournamentId),
+        player_id:Number(playerId),
+        position:Number(position)
+      });
+
+    if(error) throw error;
+
+    status.textContent='Result added successfully.';
+
+    document.getElementById('resultPlayerSelect').value='';
+    document.getElementById('resultPosition').value='';
+
+    await renderLeaderboard();
+
+  }catch(e){
+    console.error(e);
+    status.textContent=e.message || 'Could not add result.';
+    status.style.color='var(--danger)';
+  }
+}
+loadResultTournaments();
+loadResultPlayers();
 async function loadDychessTournaments(){
   const box=document.getElementById('tournamentsBox');
 

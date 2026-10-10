@@ -1062,10 +1062,11 @@ if (typeof Chess === 'undefined' ||
 
   const board = Chessboard('dychessPuzzleBoard', {
     position: 'start',
-    draggable: true,
+    draggable: false,
     pieceTheme:
       'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-
+onMouseoutSquare: function () {},
+onMouseoverSquare: function () {},
     onDragStart: function (source, piece) {
       if (solved || game.game_over()) return false;
       if (game.turn() === 'w' && piece.charAt(0) !== 'w') return false;
@@ -1091,6 +1092,51 @@ setTimeout(function () {
       board.position(game.fen());
     }
   });
+   let selectedSquare = null;
+
+  document.getElementById('dychessPuzzleBoard')
+    .addEventListener('click', function (event) {
+      const squareElement = event.target.closest('[data-square]');
+      if (!squareElement) return;
+
+      const square = squareElement.getAttribute('data-square');
+
+      if (selectedSquare === null) {
+        const piece = game.get(square);
+
+        if (piece && piece.color === game.turn()) {
+          selectedSquare = square;
+          document.getElementById('dychessPuzzleMessage').textContent =
+            'Selected ' + square + '. Now tap the square you want to move to.';
+        }
+        return;
+      }
+
+      const move = game.move({
+        from: selectedSquare,
+        to: square,
+        promotion: 'q'
+      });
+
+      if (move) {
+        board.position(game.fen());
+        document.getElementById('dychessPuzzleMessage').textContent =
+          'Move played: ' + move.san + '. Click Check Answer.';
+        selectedSquare = null;
+      } else {
+        const piece = game.get(square);
+
+        if (piece && piece.color === game.turn()) {
+          selectedSquare = square;
+          document.getElementById('dychessPuzzleMessage').textContent =
+            'Selected ' + square + '. Now tap your destination square.';
+        } else {
+          selectedSquare = null;
+          document.getElementById('dychessPuzzleMessage').textContent =
+            'That move is not legal. Tap one of your pieces to try again.';
+        }
+      }
+    });
 
   window.dychessCheckPuzzle = function () {
     const message = document.getElementById('dychessPuzzleMessage');

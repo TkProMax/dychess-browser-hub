@@ -981,13 +981,22 @@ refreshPlayers();loadTournaments();
 <style>
   #dychessPuzzleBoard {
     width: 100% !important;
-    max-width: 420px;
+    max-width: 400px;
     margin: 0 auto;
   }
 
   #dychessPuzzleBoard .board-b72b1 {
-    border: 3px solid #303030;
+    width: 100% !important;
     box-sizing: border-box;
+    border: 3px solid #303030;
+  }
+
+  #dychessPuzzleBoard .square-55d63 {
+    width: 12.5% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+    position: relative;
   }
 
   #dychessPuzzleBoard .white-1e1d7 {
@@ -998,13 +1007,21 @@ refreshPlayers();loadTournaments();
     background-color: #779556 !important;
   }
 
-  #dychessPuzzleBoard .square-55d63 {
-    box-sizing: border-box;
+  #dychessPuzzleBoard .piece-417db {
+    width: 100% !important;
+    height: 100% !important;
+    background-size: contain !important;
   }
 
   #dychessPuzzleBoard img {
     max-width: 100%;
     max-height: 100%;
+  }
+
+  @media (max-width: 480px) {
+    #dychessPuzzleBoard {
+      max-width: 320px;
+    }
   }
 </style>
 <!-- DYCHESS Puzzle Libraries -->

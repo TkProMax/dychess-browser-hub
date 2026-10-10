@@ -979,14 +979,28 @@ refreshPlayers();loadTournaments();
 
 
 <style>
-  #dychessPuzzleBoard {
-    width: 100% !important;
-    max-width: 400px;
-    margin: 0 auto;
-    touch-action: none;
+#dychessPuzzleBoard {
+width: 100% !important;
+max-width: 400px;
+margin: 0 auto;
+touch-action: none;
 user-select: none;
 -webkit-user-select: none;
-  }
+position: relative;
+}
+
+#dychessPuzzleBoard .board-b72b1 {
+width: 100% !important;
+aspect-ratio: 1 / 1;
+box-sizing: border-box;
+}
+
+#dychessPuzzleBoard .square-55d63 {
+width: 12.5% !important;
+height: auto !important;
+aspect-ratio: 1 / 1;
+box-sizing: border-box;
+}
 
   #dychessPuzzleBoard .board-b72b1 {
     width: 100% !important;

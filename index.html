@@ -982,12 +982,23 @@ refreshPlayers();loadTournaments();
 
 <script>
 (function () {
-  if (typeof Chess === 'undefined' ||
-      typeof Chessboard === 'undefined') {
-    document.getElementById('dychessPuzzleMessage').textContent =
-      'Chessboard could not load. Please refresh the page.';
-    return;
-  }
+
+if (typeof Chess === 'undefined' ||
+    typeof Chessboard === 'undefined' ||
+    typeof jQuery === 'undefined') {
+
+  const missing = [];
+
+  if (typeof Chess === 'undefined') missing.push('chess.js');
+  if (typeof jQuery === 'undefined') missing.push('jQuery');
+  if (typeof Chessboard === 'undefined') missing.push('chessboard.js');
+
+  document.getElementById('dychessPuzzleMessage').textContent =
+    'Library not loaded: ' + missing.join(', ');
+
+  return;
+}
+
 
   const game = new Chess();
   let solved = false;

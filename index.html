@@ -1002,19 +1002,19 @@ aspect-ratio: 1 / 1;
 box-sizing: border-box;
 }
 
-  #dychessPuzzleBoard .board-b72b1 {
-    width: 100% !important;
-    box-sizing: border-box;
-    border: 3px solid #303030;
-  }
+#dychessPuzzleBoard .board-b72b1 {
+width: 100% !important;
+box-sizing: border-box;
+border: 3px solid #303030;
+overflow: hidden;
+}
 
-  #dychessPuzzleBoard .square-55d63 {
-    width: 12.5% !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1;
-    box-sizing: border-box;
-    position: relative;
-  }
+#dychessPuzzleBoard .square-55d63 {
+width: 12.5% !important;
+height: 12.5% !important;
+box-sizing: border-box;
+position: relative;
+}
 
   #dychessPuzzleBoard .white-1e1d7 {
     background-color: #f0d9b5 !important;
@@ -1094,8 +1094,12 @@ onMouseoverSquare: function () {},
         promotion: 'q'
       });
 setTimeout(function () {
-  board.resize();
+board.resize();
 }, 200);
+
+window.addEventListener('resize', function () {
+board.resize();
+});
       if (move === null) return 'snapback';
 
       document.getElementById('dychessPuzzleMessage').textContent =

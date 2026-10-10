@@ -244,46 +244,54 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
         </p>
       </div>
 
-      ```html
-<div class="card" style="grid-column: 1 / -1;">
+<div class="card" style="grid-column: 1 / -1; text-align: center; padding: 24px 16px;">
+
   <div class="card-icon">♟️</div>
-  <h3>DYCHESS Chess Puzzles</h3>
-  <p>
-    Test your chess skills! Find the best move, solve
-    challenges, and improve your game.
+
+  <h3 style="font-size: 25px; margin: 8px 0;">DYCHESS Chess Puzzles</h3>
+
+  <p style="font-size: 16px; color: #222; margin-bottom: 20px;">
+    Challenge your mind. Find the best move and improve your chess skills!
   </p>
 
-  <div id="dychessPuzzleBoard"
-     style="width:100%; max-width:260px; margin:12px auto;">
+  <div style="width: 100%; max-width: 260px; margin: 0 auto 18px;">
+    <div id="dychessPuzzleBoard" style="width: 100%;"></div>
   </div>
 
-  <p id="dychessPuzzleMessage"
-     style="color:#000; font-size:17px; text-align:center;">
-    White to move: play e4 (move the pawn from e2 to e4).
-  </p>
+  <div style="max-width: 420px; margin: 0 auto;">
 
-  <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
-    <button onclick="dychessCheckPuzzle()"
-      style="padding:12px 18px; cursor:pointer;">
-      Check Answer
-    </button>
+    <p id="dychessPuzzleMessage"
+       style="color: #000; font-size: 16px; line-height: 1.6; margin: 16px 0;">
+      White to move: try e4!
+    </p>
 
-    <button onclick="dychessShowHint()"
-      style="padding:12px 18px; cursor:pointer;">
-      Show Hint
-    </button>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 18px 0;">
 
-    <button onclick="dychessResetPuzzle()"
-      style="padding:12px 18px; cursor:pointer;">
-      Reset Puzzle
-    </button>
+      <button onclick="dychessCheckPuzzle()"
+        style="padding: 11px 16px; border-radius: 8px; cursor: pointer;">
+        Check Answer
+      </button>
+
+      <button onclick="dychessShowHint()"
+        style="padding: 11px 16px; border-radius: 8px; cursor: pointer;">
+        Show Hint
+      </button>
+
+      <button onclick="dychessResetPuzzle()"
+        style="padding: 11px 16px; border-radius: 8px; cursor: pointer;">
+        Reset Puzzle
+      </button>
+
+    </div>
+
+    <div style="background: #f2f5f8; border-radius: 10px; padding: 12px; margin-top: 16px;">
+      <p style="color: #111; font-size: 16px; margin: 0;">
+        🏆 Puzzles solved: <strong id="dychessPuzzleScore">0</strong>
+      </p>
+    </div>
+
   </div>
-
-  <p style="text-align:center; color:#000; font-size:16px; margin-top:15px;">
-    Puzzles solved: <strong id="dychessPuzzleScore">0</strong>
-  </p>
 </div>
-```
   </div>
 </section>
 

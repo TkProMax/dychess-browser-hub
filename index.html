@@ -1075,7 +1075,9 @@ if (typeof Chess === 'undefined' ||
         to: target,
         promotion: 'q'
       });
-
+setTimeout(function () {
+  board.resize();
+}, 200);
       if (move === null) return 'snapback';
 
       document.getElementById('dychessPuzzleMessage').textContent =

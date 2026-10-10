@@ -255,6 +255,21 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
   </p>
 
   <div style="width: 100%; max-width: 260px; margin: 0 auto 18px;">
+    <div style="max-width: 320px; margin: 0 auto 16px;">
+  <label for="dychessPuzzleSelect"
+    style="display: block; color: #111; font-size: 16px; margin-bottom: 8px;">
+    Choose Your Chess Challenge
+  </label>
+
+  <select id="dychessPuzzleSelect"
+    style="width: 100%; padding: 10px; border-radius: 8px; font-size: 16px;">
+    <option value="0">Puzzle 1 — Easy</option>
+    <option value="1">Puzzle 2 — Easy</option>
+    <option value="2">Puzzle 3 — Medium</option>
+    <option value="3">Puzzle 4 — Medium</option>
+    <option value="4">Puzzle 5 — Hard</option>
+  </select>
+</div>
     <div id="dychessPuzzleBoard" style="width: 100%;"></div>
   </div>
 
@@ -287,6 +302,9 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
     <div style="background: #f2f5f8; border-radius: 10px; padding: 12px; margin-top: 16px;">
       <p style="color: #111; font-size: 16px; margin: 0;">
         🏆 Puzzles solved: <strong id="dychessPuzzleScore">0</strong>
+      <p style="color: #111; font-size: 16px; margin: 8px 0 0;">
+  ⭐ Puzzle points: <strong id="dychessPuzzlePoints">0</strong>
+</p>
       </p>
     </div>
 
@@ -1073,9 +1091,50 @@ if (typeof Chess === 'undefined' ||
   const game = new Chess();
   let solved = false;
   let score = 0;
+    const dychessPuzzles = [
+    {
+      name: 'Easy — Checkmate in One',
+      fen: '7k/8/5KQ1/8/8/8/8/8 w - - 0 1',
+      answer: 'Qg7#',
+      hint: 'Move the queen from g6 to g7 to checkmate the black king.',
+      points: 1
+    },
+    {
+      name: 'Easy — Checkmate in One',
+      fen: 'k7/8/1QK5/8/8/8/8/8 w - - 0 1',
+      answer: 'Qb7#',
+      hint: 'Move the queen from b6 to b7 to checkmate the black king.',
+      points: 1
+    },
+    {
+      name: 'Medium — Checkmate in One',
+      fen: '8/8/8/8/8/5KQ1/8/7k w - - 0 1',
+      answer: 'Qg2#',
+      hint: 'Look for a queen move that traps the black king in the corner.',
+      points: 2
+    },
+    {
+      name: 'Medium — Checkmate in One',
+      fen: '8/8/8/8/8/1QK5/8/k7 w - - 0 1',
+      answer: 'Qb2#',
+      hint: 'Move the queen one square down to b2.',
+      points: 2
+    },
+    {
+      name: 'Hard — Checkmate in One',
+      fen: '7k/8/5K2/6Q1/8/8/8/8 w - - 0 1',
+      answer: 'Qg7#',
+      hint: 'Find the queen move that covers the black king’s escape squares.',
+      points: 3
+    }
+  ];
 
+  let currentPuzzle = 0;
+  let puzzlePoints = 0;
+
+  game.load(dychessPuzzles[currentPuzzle].fen);
   const board = Chessboard('dychessPuzzleBoard', {
-    position: 'start',
+    position: dychessPuzzles[currentPuzzle].fen,
     draggable: false,
     pieceTheme:
       'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
@@ -1159,37 +1218,54 @@ board.resize();
 
   window.dychessCheckPuzzle = function () {
     const message = document.getElementById('dychessPuzzleMessage');
+    const puzzle = dychessPuzzles[currentPuzzle];
+    const moves = game.history();
 
     if (solved) {
-      message.textContent = 'You have already solved this challenge!';
+      message.textContent = 'You have already solved this puzzle!';
       return;
     }
 
-    const moves = game.history();
-
-    if (moves.length === 1 && moves[0] === 'e4') {
+    if (moves.length === 1 && moves[0] === puzzle.answer) {
       solved = true;
       score++;
+      puzzlePoints += puzzle.points;
+
       document.getElementById('dychessPuzzleScore').textContent = score;
-      message.textContent = 'Correct! e4 is a strong opening move. Well played!';
+
+      message.textContent =
+        'Correct! You earned ' + puzzle.points +
+        ' puzzle points. Total puzzle points: ' + puzzlePoints + '.';
     } else {
       message.textContent =
-        'Not quite! Try moving the pawn in front of the king from e2 to e4.';
+        'Not quite! Try again, or click Show Hint for help.';
     }
   };
 
   window.dychessShowHint = function () {
     document.getElementById('dychessPuzzleMessage').textContent =
-      'Hint: Select the white pawn on e2 and move it two squares forward to e4.';
+      'Hint: ' + dychessPuzzles[currentPuzzle].hint;
   };
 
   window.dychessResetPuzzle = function () {
-    game.reset();
+    game.load(dychessPuzzles[currentPuzzle].fen);
     solved = false;
-    board.start();
+    board.position(dychessPuzzles[currentPuzzle].fen);
+
     document.getElementById('dychessPuzzleMessage').textContent =
-      'White to move: try e4!';
+      'Try to solve: ' + dychessPuzzles[currentPuzzle].name;
   };
+   document.getElementById('dychessPuzzleSelect')
+    .addEventListener('change', function () {
+      currentPuzzle = Number(this.value);
+
+      game.load(dychessPuzzles[currentPuzzle].fen);
+      solved = false;
+      board.position(dychessPuzzles[currentPuzzle].fen);
+
+      document.getElementById('dychessPuzzleMessage').textContent =
+        'Try to solve: ' + dychessPuzzles[currentPuzzle].name;
+    });
 
   window.addEventListener('resize', board.resize);
 })();

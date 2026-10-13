@@ -203,7 +203,9 @@ let currentAdmin = false;
         ? 'You are signed in as an authorised DYCHESS admin.'
         : 'You are viewing the library as a visitor.';
     }
-
+function safeText(value) {
+  return String(value ?? '');
+}
     async function loadBooks() {
       bookGrid.replaceChildren();
       const { data: books, error } = await db

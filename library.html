@@ -423,7 +423,7 @@ function safeText(value) {
     });
 
     async function startLibrary() {
-     if (SUPABASE_URL.includes('https://puogdezkkgcgaxyzofoe.supabase.co') || SUPABASE_KEY.includes('sb_publishable_cKWMrNF-V40TZpdQp-ln6g_UvwbINQy')) {
+    if (SUPABASE_URL.includes('YOUR_SUPABASE_URL') || SUPABASE_KEY.includes('YOUR_SUPABASE_KEY')) {
         bookGrid.textContent = 'Library setup is incomplete: the Supabase URL and publishable key must be added to library.html.';
         authMessage.textContent = 'Connection settings are not configured yet.';
         return;

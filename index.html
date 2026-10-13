@@ -291,7 +291,7 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
   </p>
 
  
-    <div style="max-width: 320px; margin: 0 auto 16px;">
+    <div style="max-width: 320px; margin: 0 auto 6px;">
   <label for="dychessPuzzleSelect"
     style="display: block; color: #111; font-size: 13px; margin-bottom: 4px;">
     Choose Your Chess Challenge
@@ -306,30 +306,30 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
     <option value="4">Puzzle 5 — Hard</option>
   </select>
 </div>
-    <div id="dychessPuzzleBoard" style="width: 100%;"></div>
+    <div id="dychessPuzzleBoard" style="width: 100%; max-width: 360px; margin: 0 auto;"></div>
   </div>
 
   <div style="max-width: 420px; margin: 0 auto;">
 
     <p id="dychessPuzzleMessage"
-       style="color: #000; font-size: 16px; line-height: 1.6; margin: 16px 0;">
+       style="color: #000; font-size: 13px; line-height: 1.4; margin: 6px 0;">
       White to move: try e4!
     </p>
 
     <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 18px 0;">
 
       <button onclick="dychessCheckPuzzle()"
-        style="padding: 11px 16px; border-radius: 8px; cursor: pointer;">
+        style="padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">
         Check Answer
       </button>
 
       <button onclick="dychessShowHint()"
-        style="padding: 11px 16px; border-radius: 8px; cursor: pointer;">
+        style="padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">
         Show Hint
       </button>
 
       <button onclick="dychessResetPuzzle()"
-        style="padding: 11px 16px; border-radius: 8px; cursor: pointer;">
+        style="padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">
         Reset Puzzle
       </button>
 

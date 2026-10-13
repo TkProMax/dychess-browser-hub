@@ -5,37 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DYCHESS Chess Library</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f7f2;
       color: #111;
     }
-
     header {
       background: #244b2b;
       color: white;
-      padding: 24px 18px;
+      padding: 25px 18px;
       text-align: center;
     }
-
-    header h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-    }
-
-    header p {
-      margin: 0;
-      font-size: 15px;
-    }
-
-    .back-link {
+    header h1 { margin: 0 0 8px; }
+    header p { margin: 0; }
+    .back {
       display: inline-block;
       margin-top: 18px;
       padding: 10px 16px;
@@ -45,134 +31,415 @@
       text-decoration: none;
       font-weight: bold;
     }
-
-    main {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 0 18px;
-    }
-
-    .intro {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .intro h2 {
-      font-size: 25px;
-      margin-bottom: 8px;
-    }
-
-    .intro p {
-      color: #444;
-      line-height: 1.6;
-    }
-
+    main { max-width: 1100px; margin: 30px auto; padding: 0 18px; }
+    .intro { text-align: center; margin-bottom: 25px; }
     .book-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 18px;
     }
-
-    .book-card {
+    .book-card, .panel {
       background: white;
       border: 1px solid #dce3d7;
       border-radius: 14px;
-      padding: 22px;
-      text-align: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.04);
     }
-
-    .book-icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
-
-    .book-card h3 {
-      margin: 8px 0;
-      font-size: 19px;
-    }
-
-    .book-card p {
-      color: #444;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .book-status {
+    .book-card h3 { margin: 8px 0; }
+    .book-card p { line-height: 1.6; color: #444; }
+    .book-icon { font-size: 36px; }
+    .action {
       display: inline-block;
-      background: #edf4e8;
-      color: #315b25;
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 12px;
+      margin: 6px 5px 0 0;
+      padding: 9px 12px;
+      border: 0;
+      border-radius: 7px;
+      background: #244b2b;
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
       font-weight: bold;
-      margin-top: 8px;
     }
-
-    footer {
-      text-align: center;
-      padding: 24px 15px;
-      color: #555;
-      font-size: 13px;
+    .secondary { background: #e9efe5; color: #244b2b; }
+    .panel { margin-top: 30px; }
+    .panel h2 { margin-top: 0; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #bbb;
+      border-radius: 7px;
+      font: inherit;
     }
+    textarea { min-height: 80px; resize: vertical; }
+    .muted { color: #555; font-size: 14px; line-height: 1.5; }
+    #adminPanel { display: none; }
+    #message { margin-top: 12px; font-weight: bold; }
+    footer { text-align: center; padding: 25px; color: #555; font-size: 13px; }
   </style>
-
 </head>
-
 <body>
-
   <header>
     <h1>📚 DYCHESS Chess Library</h1>
-    <p>Your home for chess learning, books, and improvement.</p>
-    <a class="back-link" href="index.html">← Back to DYCHESS Hub</a>
+    <p>Learn, study, and improve your game.</p>
+    <a class="back" href="index.html">← Back to DYCHESS Hub</a>
   </header>
 
   <main>
-    <div class="intro">
+    <section class="intro">
       <h2>Explore the Library</h2>
-      <p>
-        Discover chess books and learning resources to improve your openings,
-        tactics, strategy, and overall understanding of the game.
-      </p>
+      <p>Browse chess books and learning resources shared by DYCHESS.</p>
+    </section>
+
+<section id="bookGrid" class="book-grid">
+  <div class="book-card">Loading chess books...</div>
+</section>
+
+<section class="panel">
+  <h2>DYCHESS Admin</h2>
+  <p class="muted">Sign in with your existing DYCHESS admin account to manage library books.</p>
+  <button class="action" id="loginButton" type="button">Admin Login</button>
+  <button class="action secondary" id="logoutButton" type="button" hidden>Sign Out</button>
+  <p id="authMessage" class="muted"></p>
+</section>
+
+<section class="panel" id="adminPanel">
+  <h2>Add a Chess Book</h2>
+  <p class="muted">For online books, provide a link to a legitimate reading source. Upload only PDFs you have permission to distribute.</p>
+
+  <form id="bookForm">
+    <label for="title">Book title *</label>
+    <input id="title" required maxlength="200">
+
+    <label for="author">Author</label>
+    <input id="author" maxlength="200">
+
+    <label for="description">Description</label>
+    <textarea id="description" maxlength="2000"></textarea>
+
+    <label for="bookType">Book type *</label>
+    <select id="bookType">
+      <option value="online">Online book / reading link</option>
+      <option value="pdf">PDF upload</option>
+    </select>
+
+    <div id="onlineFields">
+      <label for="readUrl">Read online URL</label>
+      <input id="readUrl" type="url" placeholder="https://...">
+
+      <label for="downloadUrl">Download URL (optional)</label>
+      <input id="downloadUrl" type="url" placeholder="https://...">
     </div>
 
-<div class="book-grid">
+    <div id="pdfFields" hidden>
+      <label for="pdfFile">Choose PDF file (maximum 20 MB)</label>
+      <input id="pdfFile" type="file" accept="application/pdf,.pdf">
+    </div>
 
-  <div class="book-card">
-    <div class="book-icon">📖</div>
-    <h3>Chess Fundamentals</h3>
-    <p>Learn the basic principles of chess and build a stronger foundation.</p>
-    <span class="book-status">Resources coming soon</span>
-  </div>
-
-  <div class="book-card">
-    <div class="book-icon">♟️</div>
-    <h3>Opening Theory</h3>
-    <p>Explore opening principles, plans, and ideas for the early game.</p>
-    <span class="book-status">Resources coming soon</span>
-  </div>
-
-  <div class="book-card">
-    <div class="book-icon">🧠</div>
-    <h3>Tactics and Combinations</h3>
-    <p>Study forks, pins, sacrifices, checkmate patterns, and calculation.</p>
-    <span class="book-status">Resources coming soon</span>
-  </div>
-
-  <div class="book-card">
-    <div class="book-icon">🏆</div>
-    <h3>Strategy and Master Games</h3>
-    <p>Study positional play, planning, endgames, and games by great players.</p>
-    <span class="book-status">Resources coming soon</span>
-  </div>
-
-</div>
+    <button class="action" type="submit">Save Book</button>
+  </form>
+  <p id="message" role="status"></p>
+</section>
 
   </main>
 
-  <footer>
-    © DYCHESS Chess Community
-  </footer>
+  <footer>© DYCHESS Chess Community</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    /*
+      IMPORTANT:
+      Set the two values below to the same Supabase project URL
+      and publishable/anon key used by index.html.
+      Never put a service_role or secret key in website code.
+    */
+    const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_PROJECT_URL_HERE';
+    const SUPABASE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
+
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const bookGrid = document.getElementById('bookGrid');
+    const adminPanel = document.getElementById('adminPanel');
+    const authMessage = document.getElementById('authMessage');
+    const message = document.getElementById('message');
+    let currentAdmin = false;
+
+    function safeText(value) {
+      return String(value || '');
+    }
+
+    function safeExternalUrl(value) {
+      try {
+        const url = new URL(value);
+        return ['https:', 'http:'].includes(url.protocol) ? url.href : '';
+      } catch {
+        return '';
+      }
+    }
+
+    async function isDychessAdmin() {
+      const { data: userData, error: userError } = await db.auth.getUser();
+      if (userError || !userData.user) return false;
+
+      const { data, error } = await db
+        .from('admin_users')
+        .select('user_id')
+        .eq('user_id', userData.user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error(error);
+        return false;
+      }
+      return !!data;
+    }
+
+    async function refreshAuthState() {
+      currentAdmin = await isDychessAdmin();
+      adminPanel.style.display = currentAdmin ? 'block' : 'none';
+      document.getElementById('logoutButton').hidden = !currentAdmin;
+      document.getElementById('loginButton').hidden = currentAdmin;
+      authMessage.textContent = currentAdmin
+        ? 'You are signed in as an authorised DYCHESS admin.'
+        : 'You are viewing the library as a visitor.';
+    }
+
+    async function loadBooks() {
+      bookGrid.replaceChildren();
+      const { data: books, error } = await db
+        .from('chess_library')
+        .select('id,title,author,description,book_type,read_url,download_url,storage_path,created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        card.textContent = 'Unable to load books. Check the Supabase connection and table permissions.';
+        bookGrid.appendChild(card);
+        return;
+      }
+
+      if (!books || books.length === 0) {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        card.textContent = 'No books have been added yet. Please check back soon.';
+        bookGrid.appendChild(card);
+        return;
+      }
+
+      for (const book of books) {
+        const card = document.createElement('article');
+        card.className = 'book-card';
+
+        const icon = document.createElement('div');
+        icon.className = 'book-icon';
+        icon.textContent = book.book_type === 'pdf' ? '📄' : '📖';
+
+        const title = document.createElement('h3');
+        title.textContent = safeText(book.title);
+
+        const author = document.createElement('p');
+        author.textContent = book.author ? 'By ' + book.author : 'DYCHESS learning resource';
+
+        const description = document.createElement('p');
+        description.textContent = safeText(book.description);
+
+        card.append(icon, title, author, description);
+
+        const readUrl = safeExternalUrl(book.read_url);
+        const downloadUrl = safeExternalUrl(book.download_url);
+
+        if (readUrl) {
+          const link = document.createElement('a');
+          link.className = 'action';
+          link.href = readUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = 'Read Online';
+          card.appendChild(link);
+        }
+
+        if (downloadUrl) {
+          const link = document.createElement('a');
+          link.className = 'action secondary';
+          link.href = downloadUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = 'Download Book';
+          card.appendChild(link);
+        }
+
+        if (book.storage_path) {
+          const link = document.createElement('button');
+          link.className = 'action';
+          link.type = 'button';
+          link.textContent = 'Open PDF';
+          link.addEventListener('click', async () => {
+            const { data, error } = await db.storage
+              .from('dychess-books')
+              .createSignedUrl(book.storage_path, 300);
+
+            if (error) {
+              alert('Could not open this PDF. Please try again.');
+              console.error(error);
+              return;
+            }
+            window.open(data.signedUrl, '_blank', 'noopener');
+          });
+          card.appendChild(link);
+        }
+
+        if (currentAdmin) {
+          const removeButton = document.createElement('button');
+          removeButton.className = 'action secondary';
+          removeButton.type = 'button';
+          removeButton.textContent = 'Delete Book';
+          removeButton.addEventListener('click', async () => {
+            if (!confirm('Delete this book record? This will not automatically delete its PDF file.')) return;
+            const { error } = await db.from('chess_library').delete().eq('id', book.id);
+            if (error) {
+              alert('Could not delete the book record.');
+              console.error(error);
+              return;
+            }
+            await loadBooks();
+          });
+          card.appendChild(removeButton);
+        }
+
+        bookGrid.appendChild(card);
+      }
+    }
+
+    document.getElementById('loginButton').addEventListener('click', async () => {
+      const email = prompt('DYCHESS Admin Email');
+      if (!email) return;
+      const password = prompt('DYCHESS Admin Password');
+      if (!password) return;
+
+      const { error } = await db.auth.signInWithPassword({
+        email: email.trim(),
+        password
+      });
+
+      if (error) {
+        alert(error.message || 'Admin login failed.');
+        return;
+      }
+
+      await refreshAuthState();
+      if (!currentAdmin) {
+        await db.auth.signOut();
+        await refreshAuthState();
+        alert('This account is not authorized as a DYCHESS admin.');
+        return;
+      }
+
+      await loadBooks();
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      await db.auth.signOut();
+      await refreshAuthState();
+      await loadBooks();
+    });
+
+    document.getElementById('bookType').addEventListener('change', event => {
+      const isPdf = event.target.value === 'pdf';
+      document.getElementById('pdfFields').hidden = !isPdf;
+      document.getElementById('onlineFields').hidden = isPdf;
+    });
+
+    document.getElementById('bookForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      message.textContent = '';
+
+      if (!currentAdmin || !(await isDychessAdmin())) {
+        message.textContent = 'Please sign in with an authorised DYCHESS admin account.';
+        return;
+      }
+
+      const title = document.getElementById('title').value.trim();
+      const author = document.getElementById('author').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const bookType = document.getElementById('bookType').value;
+
+      const record = {
+        title,
+        author: author || null,
+        description: description || null,
+        book_type: bookType
+      };
+
+      if (bookType === 'online') {
+        const readUrl = safeExternalUrl(document.getElementById('readUrl').value.trim());
+        const downloadUrl = safeExternalUrl(document.getElementById('downloadUrl').value.trim());
+
+        if (!readUrl && !downloadUrl) {
+          message.textContent = 'Enter a valid reading or download URL.';
+          return;
+        }
+        record.read_url = readUrl || null;
+        record.download_url = downloadUrl || null;
+      } else {
+        const file = document.getElementById('pdfFile').files[0];
+        if (!file) {
+          message.textContent = 'Choose a PDF file first.';
+          return;
+        }
+        if (file.type !== 'application/pdf' || file.size > 20 * 1024 * 1024) {
+          message.textContent = 'Choose a PDF file no larger than 20 MB.';
+          return;
+        }
+
+        const filePath = crypto.randomUUID() + '.pdf';
+        const { error: uploadError } = await db.storage
+          .from('dychess-books')
+          .upload(filePath, file, { contentType: 'application/pdf', upsert: false });
+
+        if (uploadError) {
+          console.error(uploadError);
+          message.textContent = 'PDF upload failed. Check your storage policies.';
+          return;
+        }
+        record.storage_path = filePath;
+      }
+
+      const { error } = await db.from('chess_library').insert(record);
+      if (error) {
+        console.error(error);
+        message.textContent = 'Could not save the book record. Check the database policies.';
+        return;
+      }
+
+      document.getElementById('bookForm').reset();
+      document.getElementById('pdfFields').hidden = true;
+      document.getElementById('onlineFields').hidden = false;
+      message.textContent = 'Book added successfully.';
+      await loadBooks();
+    });
+
+    async function startLibrary() {
+      if (SUPABASE_URL.includes('PASTE_YOUR_') || SUPABASE_KEY.includes('PASTE_YOUR_')) {
+        bookGrid.textContent = 'Library setup is incomplete: the Supabase URL and publishable key must be added to library.html.';
+        authMessage.textContent = 'Connection settings are not configured yet.';
+        return;
+      }
+      await refreshAuthState();
+      await loadBooks();
+
+      db.auth.onAuthStateChange(() => {
+        setTimeout(async () => {
+          await refreshAuthState();
+          await loadBooks();
+        }, 0);
+      });
+    }
+
+    startLibrary();
+  </script>
 
 </body>
 </html>

@@ -212,7 +212,7 @@ let currentAdmin = false;
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error(error);
+        console.error('DYCHESS book loading error:', error);
         const card = document.createElement('div');
         card.className = 'book-card';
         card.textContent = 'Unable to load books. Check the Supabase connection and table permissions.';

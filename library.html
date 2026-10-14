@@ -390,7 +390,7 @@ function safeText(value) {
           message.textContent = 'Choose a PDF file first.';
           return;
         }
-        if (file.type !== 'application/pdf' || file.size > 20 * 1024 * 1024) {
+       if (file.type !== 'application/pdf' || file.size > 50 * 1024 * 1024) {
           message.textContent = 'Choose a PDF file no larger than 20 MB.';
           return;
         }

@@ -1328,6 +1328,52 @@ position: relative;
       max-width: 320px;
     }
   }
+  /* Premium DYCHESS Tournament Cards */
+#tournaments .tournament-list .feature-card {
+background: linear-gradient(145deg, #102319, #080d0a);
+color: #ffffff;
+border: 1px solid #c9a64b;
+border-radius: 16px;
+padding: 26px;
+box-shadow: 0 10px 28px rgba(8, 13, 10, 0.16);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#tournaments .tournament-list .feature-card {
+transform: translateY(-4px);
+box-shadow: 0 16px 34px rgba(8, 13, 10, 0.24);
+}
+
+#tournaments .tournament-list .feature-card h3 {
+color: #c9a64b;
+font-size: 23px;
+margin: 16px 0;
+}
+
+#tournaments .tournament-list .feature-card p {
+color: #e1e8de !important;
+line-height: 1.9;
+}
+
+#tournaments .tournament-list .badge {
+background: #c9a64b;
+color: #080d0a;
+border-radius: 20px;
+padding: 7px 12px;
+font-weight: 900;
+letter-spacing: 1px;
+}
+
+#tournaments .tournament-list .feature-card a {
+border-radius: 8px;
+font-weight: 800;
+}
+
+@media (max-width: 700px) {
+#tournaments .tournament-list .feature-card {
+padding: 20px;
+}
+}
 </style>
 <!-- DYCHESS Puzzle Libraries -->
 <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">

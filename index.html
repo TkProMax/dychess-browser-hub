@@ -319,17 +319,19 @@ footer{background:var(--green-dark);color:#cbd4c2;padding:32px 0;margin-top:20px
 
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin:18px 0;">
-  <a class="btn btn-primary" href="library.html">📚 Chess Library</a>
-  <a class="btn btn-primary" href="puzzles.html">♟️ Chess Puzzles</a>
-  <a class="btn btn-primary" href="hall-of-fame.html">🏆 Hall of Fame</a>
-  <a class="btn btn-primary" href="news.html">📰 Community News</a>
+ <a class="btn btn-primary" href="library.html">📚 Chess Library</a>
+<a class="btn btn-primary" href="puzzles.html">♟️ Chess Puzzles</a>
+<a class="btn btn-primary" href="hall-of-fame.html">🏆 Hall of Fame</a>
+<a class="btn btn-primary" href="news.html">📰 Community News</a>
+<a class="btn btn-primary" href="leaderboard.html">🏆 Check Leaderboard</a>
 </div>
 </section>
 
 
 <section class="section" id="tournaments"><div class="container"><div class="section-head"><div><h2>DYCHESS Tournaments</h2><p>Upcoming and past DYCHESS tournaments.</p></div></div><div id="tournamentsBox" class="tournament-list"><div class="empty">Loading DYCHESS tournaments…</div></div></div></section>
-<section class="section" id="leaderboard"><div class="container"><div class="section-head"><div><h2>Live Leaderboard</h2><p> </p></div></div><div id="leaderboardBox" class="empty">Connect players above to build the live leaderboard.</div></div></section>
-
+<section id="leaderboard" style="display:none;">
+  <div id="leaderboardBox"></div>
+</section>
 
 
 <section class="section" id="players"><div class="container"><div class="section-head"><div><h2>DYCHESS Players</h2><p>Connect real Lichess accounts. Player data is saved in this browser for now.</p></div></div><div class="feature-card"><span class="badge live">Lichess Connected</span><h3>Add a player</h3><p style="color:var(--muted)">Enter the exact Lichess username. No password or API token is required for public profile and game data.</p><form id="playerForm" class="connect"><input id="username" class="input" placeholder="e.g. thibault" autocomplete="off" required><button class="btn btn-primary" type="submit">Connect Player</button></form><div id="connectStatus" class="status"></div></div><div style="height:16px"></div><div id="playersGrid" class="players-grid"></div></div></section>
@@ -735,6 +737,7 @@ async function loadPlayer(username){
 
 async function renderLeaderboard(){
   const box=document.getElementById('leaderboardBox');
+  if(!box) return;
 
   box.className='';
   box.innerHTML='Loading DYCHESS leaderboard…';

@@ -1,1 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DYCHESS Community News</title>
+  <meta name="description" content="The latest DYCHESS tournament announcements, featured matches, and community achievements.">
 
+  <style>
+    :root {
+      --green: #173f2b;
+      --green-light: #245b3b;
+      --gold: #d6b45c;
+      --ink: #101512;
+      --muted: #68736b;
+      --line: #e0e7e1;
+      --surface: #ffffff;
+      --background: #f4f7f4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--background);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    header {
+      background: #101512;
+      color: white;
+      border-bottom: 3px solid var(--gold);
+    }
+
+    .container {
+      width: min(1080px, 92%);
+      margin: auto;
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 14px 0;
+    }
+
+    .logo {
+      color: white;
+      text-decoration: none;
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .logo span { color: var(--gold); }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: #e8eee9;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    nav a:hover { color: var(--gold); }
+
+    .hero {
+      padding: 54px 0 38px;
+      background: linear-gradient(135deg, #122c1e, #101512);
+      color: white;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1.15;
+      margin: 10px 0;
+    }
+
+    .hero p {
+      max-width: 620px;
+      color: #d5dfd7;
+      margin-bottom: 0;
+    }
+
+    main { padding: 30px 0 50px; }
+
+    .section-heading { margin-bottom: 20px; }
+
+    .section-heading h2 {
+      font-size: 26px;
+      margin: 0;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      margin: 4px 0 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 5px 18px rgba(16, 21, 18, 0.05);
+      min-width: 0;
+    }
+
+    .card-icon { font-size: 30px; }
+
+    .card h3 {
+      margin: 8px 0 12px;
+      font-size: 20px;
+    }
+
+    .card p { color: #39463d; }
+
+    .tag {
+      display: inline-block;
+      background: #edf3e9;
+      color: var(--green);
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .match { text-align: center; }
+
+    .player {
+      font-size: 23px;
+      font-weight: 900;
+      color: #101512;
+      overflow-wrap: anywhere;
+    }
+
+    .versus { font-size: 34px; margin: 8px 0; }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 11px 17px;
+      border-radius: 9px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .back-link:hover { background: var(--green-light); }
+
+    footer {
+      background: #101512;
+      color: #cbd5ce;
+      text-align: center;
+      padding: 22px 12px;
+      font-size: 13px;
+      border-top: 3px solid var(--gold);
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      .nav { align-items: flex-start; }
+      nav { gap: 12px; }
+      .hero { padding: 38px 0 30px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <a class="logo" href="index.html">♞ DY<span>CHESS</span></a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="index.html#tournaments">Tournaments</a>
+        <a href="index.html#leaderboard">Leaderboard</a>
+        <a href="hall-of-fame.html">Hall of Fame</a>
+        <a href="library.html">Chess Library</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="eyebrow">The DYCHESS Community</div>
+      <h1>Community News</h1>
+      <p>Tournament announcements, featured rivalries, and achievements from our chess community.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="section-heading">
+      <h2>Latest DYCHESS</h2>
+      <p>Stay connected with what's happening in our community.</p>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <div class="card-icon">📢</div>
+        <span class="tag">COMMUNITY ANNOUNCEMENT</span>
+        <h3>DYCHESS Weekly Tournaments</h3>
+        <p>Join us for exciting chess battles every <strong>Friday and Sunday!</strong></p>
+        <p>Come play, compete, and climb the DYCHESS leaderboard.</p>
+      </article>
+
+      <article class="card match">
+        <div class="card-icon">🥊</div>
+        <span class="tag">🔥 FEATURED MATCH</span>
+        <h3>DYCHESS Cage Match</h3>
+        <div class="player">Winnie54321</div>
+        <div class="versus">⚔️</div>
+        <div class="player">Ndamola</div>
+      </article>
+
+      <article class="card">
+        <div class="card-icon">🏆</div>
+        <span class="tag">COMMUNITY ACHIEVEMENTS</span>
+        <h3>Top 3 Players</h3>
+        <p>🥇 <strong>1st Place:</strong> distinguishedReg</p>
+        <p>🥈 <strong>2nd Place:</strong> ndamola</p>
+        <p>🥉 <strong>3rd Place:</strong> tangible_ay</p>
+      </article>
+    </div>
+
+    <a class="back-link" href="index.html">← Back to DYCHESS Hub</a>
+  </main>
+
+  <footer>
+    © 2026 DYCHESS. Built for the community.
+  </footer>
+</body>
+</html>

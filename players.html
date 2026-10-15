@@ -330,7 +330,14 @@ async function refreshPlayers() {
       catch(e) { console.warn('Could not load',username,e); return null; }
     }));
 
-    renderPlayers(results.filter(Boolean));
+   renderPlayers(results.map((p, i) => p || {
+  username: usernames[i],
+  perfs: {},
+  count: { all: 0 },
+  games: [],
+  createdAt: null,
+  profileUnavailable: true
+}));
   } catch(e) {
     console.error(e);
     box.innerHTML = '<div class="empty">Could not load players from the DYCHESS database. Please refresh and try again.</div>';

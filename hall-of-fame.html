@@ -1,1 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DYCHESS Hall of Fame</title>
 
+<style>
+:root {
+  --green: #102319;
+  --black: #080d0a;
+  --gold: #c9a64b;
+  --paper: #f4f5f1;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--paper);
+  color: #111712;
+}
+header {
+  background: linear-gradient(135deg, var(--black), var(--green));
+  color: white;
+  padding: 30px 20px;
+  border-bottom: 3px solid var(--gold);
+}
+.container {
+  width: min(900px, calc(100% - 30px));
+  margin: auto;
+}
+.brand {
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+header h1 {
+  font-size: clamp(32px, 6vw, 48px);
+  margin: 14px 0 8px;
+}
+header p {
+  color: #d4dccd;
+  line-height: 1.7;
+}
+.back {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 11px 15px;
+  border: 1px solid var(--gold);
+  border-radius: 7px;
+  color: white;
+  text-decoration: none;
+}
+main { padding: 35px 0 50px; }
+.intro {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.intro h2 {
+  color: var(--green);
+  font-size: 28px;
+}
+.intro p { line-height: 1.7; }
+.honour-card {
+  background: white;
+  border: 1px solid #d8dfd7;
+  border-top: 4px solid var(--gold);
+  border-radius: 15px;
+  padding: 26px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px #080d0a0c;
+}
+.icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+}
+.honour-card h2 {
+  margin: 0 0 14px;
+  color: var(--green);
+}
+.award {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f4f5f1;
+  padding: 17px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+.award-icon { font-size: 30px; }
+.award strong {
+  display: block;
+  color: #102319;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+.award span {
+  display: block;
+  color: #69766b;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+footer {
+  text-align: center;
+  background: var(--black);
+  color: #d4dccd;
+  padding: 22px;
+  border-top: 2px solid var(--gold);
+}
+@media(max-width:500px) {
+  .honour-card { padding: 19px; }
+  .award { padding: 13px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="container">
+    <div class="brand">THE DYCHESS BROWSER HUB</div>
+    <h1>🏆 Hall of Fame</h1>
+    <p>Celebrating the champions, legends, and memorable achievements of our chess community.</p>
+    <a class="back" href="index.html">← Back to DYCHESS Hub</a>
+  </div>
+</header>
+
+<main class="container">
+  <div class="intro">
+    <h2>Excellence. Achievement. Legacy.</h2>
+    <p>Honouring the players who help make DYCHESS special.</p>
+  </div>
+
+  <section class="honour-card">
+    <div class="icon">👑</div>
+    <h2>Season Champions</h2>
+    <div class="award">
+      <div class="award-icon">🥇</div>
+      <div>
+        <strong>Winnie54321</strong>
+        <span>Season 1 Champion</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="honour-card">
+    <div class="icon">⚔️</div>
+    <h2>Special Achievements</h2>
+    <div class="award">
+      <div class="award-icon">🏆</div>
+      <div>
+        <strong>SirAyula</strong>
+        <span>Legends Match Winner</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 DYCHESS. Built for the community.</footer>
+</body>
+</html>

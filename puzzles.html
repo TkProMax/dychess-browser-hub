@@ -1,1 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DYCHESS Chess Puzzles</title>
 
+<link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+
+<style>
+:root {
+  --green: #102319;
+  --black: #080d0a;
+  --gold: #c9a64b;
+  --paper: #f4f5f1;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--paper);
+  color: #111712;
+}
+header {
+  background: linear-gradient(135deg, var(--black), var(--green));
+  color: white;
+  padding: 25px 20px;
+  border-bottom: 3px solid var(--gold);
+}
+.header-inner, main {
+  width: min(900px, calc(100% - 30px));
+  margin: auto;
+}
+.brand {
+  color: var(--gold);
+  font-weight: 900;
+  letter-spacing: 3px;
+  font-size: 13px;
+}
+header h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(30px, 6vw, 46px);
+}
+header p { color: #d4dccd; line-height: 1.6; }
+.back {
+  display: inline-block;
+  margin-top: 8px;
+  color: white;
+  text-decoration: none;
+  border: 1px solid var(--gold);
+  padding: 10px 14px;
+  border-radius: 7px;
+}
+main { padding: 28px 0 45px; }
+.game-card {
+  background: white;
+  border: 1px solid #d8dfd7;
+  border-top: 4px solid var(--gold);
+  border-radius: 16px;
+  padding: clamp(16px, 4vw, 30px);
+  box-shadow: 0 10px 30px #080d0a12;
+}
+h2 { color: var(--green); margin-top: 0; }
+label { display: block; font-weight: 700; margin-bottom: 8px; }
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #b8c3b7;
+  border-radius: 8px;
+  font-size: 15px;
+  background: white;
+}
+.board-wrap { width: min(100%, 440px); margin: 22px auto; }
+#dychessPuzzleBoard { width: 100%; }
+#dychessPuzzleMessage {
+  background: #f4f5f1;
+  border-left: 4px solid var(--gold);
+  padding: 14px;
+  border-radius: 5px;
+  line-height: 1.6;
+  min-height: 48px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 18px 0;
+}
+button {
+  border: 0;
+  border-radius: 7px;
+  padding: 12px 16px;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--green);
+  color: white;
+}
+button.primary { background: var(--gold); color: var(--black); }
+button:hover { filter: brightness(1.08); }
+.scores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.score-box {
+  padding: 16px;
+  border-radius: 10px;
+  background: #e5eee5;
+  text-align: center;
+}
+.score-box strong {
+  display: block;
+  font-size: 27px;
+  color: var(--green);
+  margin-top: 6px;
+}
+footer {
+  text-align: center;
+  background: var(--black);
+  color: #d4dccd;
+  padding: 22px;
+  border-top: 2px solid var(--gold);
+}
+@media(max-width:480px) {
+  .actions button { flex: 1 1 40%; padding: 12px 8px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">THE DYCHESS BROWSER HUB</div>
+    <h1>♟ Chess Puzzles</h1>
+    <p>Think ahead. Find the winning move. Earn puzzle points.</p>
+    <a class="back" href="index.html">← Back to DYCHESS Hub</a>
+  </div>
+</header>
+
+<main>
+  <div class="game-card">
+    <h2>Challenge Yourself</h2>
+    <p>Choose a challenge, find checkmate in one move, and check your answer.</p>
+
+    <label for="dychessPuzzleSelect">Choose Your Chess Challenge</label>
+    <select id="dychessPuzzleSelect">
+      <option value="0">Puzzle 1 — Easy (1 point)</option>
+      <option value="1">Puzzle 2 — Easy (1 point)</option>
+      <option value="2">Puzzle 3 — Medium (2 points)</option>
+      <option value="3">Puzzle 4 — Medium (2 points)</option>
+      <option value="4">Puzzle 5 — Hard (3 points)</option>
+    </select>
+
+    <div class="board-wrap">
+      <div id="dychessPuzzleBoard"></div>
+    </div>
+
+    <p id="dychessPuzzleMessage" aria-live="polite">
+      Choose a puzzle and find the checkmate move.
+    </p>
+
+    <div class="actions">
+      <button class="primary" onclick="dychessCheckPuzzle()">Check Answer</button>
+      <button onclick="dychessShowHint()">Show Hint</button>
+      <button onclick="dychessResetPuzzle()">Reset Puzzle</button>
+    </div>
+
+    <div class="scores">
+      <div class="score-box">
+        🏆 Puzzles solved
+        <strong id="dychessPuzzleScore">0</strong>
+      </div>
+      <div class="score-box">
+        ⭐ Puzzle points
+        <strong id="dychessPuzzlePoints">0</strong>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>© 2026 DYCHESS. Built for the community.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+<script>
+(function () {
+  const message = document.getElementById('dychessPuzzleMessage');
+
+  if (typeof Chess === 'undefined' ||
+      typeof Chessboard === 'undefined' ||
+      typeof jQuery === 'undefined') {
+    message.textContent =
+      'The chess libraries did not load. Please refresh the page and try again.';
+    return;
+  }
+
+  const game = new Chess();
+  let solved = false;
+  let score = 0;
+  let currentPuzzle = 0;
+  let puzzlePoints = 0;
+  let selectedSquare = null;
+
+  const puzzles = [
+    {
+      name: 'Easy — Checkmate in One',
+      fen: '7k/8/5KQ1/8/8/8/8/8 w - - 0 1',
+      answer: 'Qg7#',
+      hint: 'Move the queen from g6 to g7 to checkmate the black king.',
+      points: 1
+    },
+    {
+      name: 'Easy — Checkmate in One',
+      fen: 'k7/8/1QK5/8/8/8/8/8 w - - 0 1',
+      answer: 'Qb7#',
+      hint: 'Move the queen from b6 to b7 to checkmate the black king.',
+      points: 1
+    },
+    {
+      name: 'Medium — Checkmate in One',
+      fen: '8/8/8/8/8/5KQ1/8/7k w - - 0 1',
+      answer: 'Qg2#',
+      hint: 'Look for a queen move that traps the black king in the corner.',
+      points: 2
+    },
+    {
+      name: 'Medium — Checkmate in One',
+      fen: '8/8/8/8/8/1QK5/8/k7 w - - 0 1',
+      answer: 'Qb2#',
+      hint: 'Move the queen down to b2 to checkmate the king.',
+      points: 2
+    },
+    {
+      name: 'Hard — Checkmate in One',
+      fen: '7k/8/5K2/6Q1/8/8/8/8 w - - 0 1',
+      answer: 'Qg7#',
+      hint: 'Find the queen move that covers the black king’s escape squares.',
+      points: 3
+    }
+  ];
+
+  game.load(puzzles[0].fen);
+
+  const board = Chessboard('dychessPuzzleBoard', {
+    position: puzzles[0].fen,
+    draggable: false,
+    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+  });
+
+  function updateBoard() {
+    board.position(game.fen());
+    board.resize();
+  }
+
+  function resetCurrentPuzzle() {
+    game.load(puzzles[currentPuzzle].fen);
+    solved = false;
+    selectedSquare = null;
+    updateBoard();
+    message.textContent = 'Try to solve: ' + puzzles[currentPuzzle].name;
+  }
+
+  document.getElementById('dychessPuzzleBoard').addEventListener('click', function (event) {
+    const squareElement = event.target.closest('[data-square]');
+    if (!squareElement || solved) return;
+
+    const square = squareElement.getAttribute('data-square');
+
+    if (selectedSquare === null) {
+      const piece = game.get(square);
+      if (piece && piece.color === game.turn()) {
+        selectedSquare = square;
+        message.textContent = 'Selected ' + square + '. Now tap your destination square.';
+      }
+      return;
+    }
+
+    const move = game.move({
+      from: selectedSquare,
+      to: square,
+      promotion: 'q'
+    });
+
+    if (move) {
+      selectedSquare = null;
+      updateBoard();
+      message.textContent = 'Move played: ' + move.san + '. Click Check Answer.';
+    } else {
+      const piece = game.get(square);
+      if (piece && piece.color === game.turn()) {
+        selectedSquare = square;
+        message.textContent = 'Selected ' + square + '. Now tap your destination square.';
+      } else {
+        selectedSquare = null;
+        message.textContent = 'That move is not legal. Select one of your pieces and try again.';
+      }
+    }
+  });
+
+  window.dychessCheckPuzzle = function () {
+    const puzzle = puzzles[currentPuzzle];
+    const moves = game.history();
+
+    if (solved) {
+      message.textContent = 'You have already solved this puzzle!';
+      return;
+    }
+
+    if (moves.length === 1 && moves[0] === puzzle.answer) {
+      solved = true;
+      score++;
+      puzzlePoints += puzzle.points;
+
+      document.getElementById('dychessPuzzleScore').textContent = score;
+      document.getElementById('dychessPuzzlePoints').textContent = puzzlePoints;
+
+      message.textContent = 'Correct! You earned ' + puzzle.points +
+        ' puzzle points. Great work!';
+    } else {
+      message.textContent = 'Not quite! Try again, or click Show Hint for help.';
+    }
+  };
+
+  window.dychessShowHint = function () {
+    message.textContent = 'Hint: ' + puzzles[currentPuzzle].hint;
+  };
+
+  window.dychessResetPuzzle = resetCurrentPuzzle;
+
+  document.getElementById('dychessPuzzleSelect').addEventListener('change', function () {
+    currentPuzzle = Number(this.value);
+    resetCurrentPuzzle();
+  });
+
+  window.addEventListener('resize', function () {
+    board.resize();
+  });
+})();
+</script>
+</body>
+</html>

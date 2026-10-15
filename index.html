@@ -1374,6 +1374,79 @@ font-weight: 800;
 padding: 20px;
 }
 }
+/* DYCHESS Premium Leaderboard */
+#leaderboard .container {
+background: #ffffff;
+border: 1px solid #d8dfd7;
+border-radius: 18px;
+padding: 28px;
+box-shadow: 0 10px 30px rgba(8, 13, 10, 0.07);
+}
+
+#leaderboard .section-head h2 {
+color: #102319;
+}
+
+#leaderboard .table {
+width: 100%;
+border-collapse: separate;
+border-spacing: 0;
+border: 1px solid #c9a64b;
+border-radius: 12px;
+overflow: hidden;
+background: #ffffff;
+}
+
+#leaderboard .table thead th {
+background: #102319;
+color: #c9a64b;
+padding: 16px 14px;
+text-align: left;
+font-size: 12px;
+font-weight: 900;
+text-transform: uppercase;
+letter-spacing: 0.6px;
+border-bottom: 2px solid #c9a64b;
+}
+
+#leaderboard .table tbody td {
+padding: 15px 14px;
+color: #111712;
+border-bottom: 1px solid #e5e9e3;
+font-weight: 600;
+}
+
+#leaderboard .table tbody tr(even) {
+background: #f4f5f1;
+}
+
+#leaderboard .table tbody tr {
+background: #e5eee5;
+}
+
+#leaderboard .table tbody tr td {
+border-bottom: none;
+}
+
+#leaderboard .table tbody td {
+color: #9a7827;
+font-weight: 900;
+}
+
+@media (max-width: 700px) {
+#leaderboard .container {
+padding: 18px 12px;
+}
+
+#leaderboard .table {
+font-size: 12px;
+}
+
+#leaderboard .table th,
+#leaderboard .table td {
+padding: 10px 7px;
+}
+}
 </style>
 <!-- DYCHESS Puzzle Libraries -->
 <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">

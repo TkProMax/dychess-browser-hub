@@ -380,73 +380,15 @@ style="display: inline-block; padding: 8px 14px; border-radius: 8px; background:
    
   </button>
 </div>  
-<div class="card" style="grid-column: 1 / -1; text-align: center; padding: 10px 10px;">
-
+<div class="card" style="text-align:center;">
   <div class="card-icon">♟️</div>
-
-  <h3 style="font-size: 19px; margin: 3px 0;">DYCHESS Chess Puzzles</h3>
-
-  <p style="font-size: 13px; color: #222; margin: 4px 0 8px;">
-    Challenge your mind. Find the best move and improve your chess skills!
+  <h3>DYCHESS Chess Puzzles</h3>
+  <p>
+    Challenge your mind, find the winning move, and earn puzzle points.
+    Choose from five chess challenges across easy, medium, and hard levels.
   </p>
-
- 
-    <div style="max-width: 320px; margin: 0 auto 6px;">
-  <label for="dychessPuzzleSelect"
-    style="display: block; color: #111; font-size: 13px; margin-bottom: 4px;">
-    Choose Your Chess Challenge
-  </label>
-
- <select id="dychessPuzzleSelect"
-    style="width: 100%; padding: 6px; border-radius: 6px; font-size: 13px;">
-    <option value="0">Puzzle 1 — Easy</option>
-    <option value="1">Puzzle 2 — Easy</option>
-    <option value="2">Puzzle 3 — Medium</option>
-    <option value="3">Puzzle 4 — Medium</option>
-    <option value="4">Puzzle 5 — Hard</option>
-  </select>
+  <a class="btn btn-primary" href="puzzles.html">Play Chess Puzzles →</a>
 </div>
-    <div id="dychessPuzzleBoard" style="width: 100%; max-width: 360px; margin: 0 auto;"></div>
-  </div>
-
-  <div style="max-width: 420px; margin: 0 auto;">
-
-    <p id="dychessPuzzleMessage"
-       style="color: #000; font-size: 13px; line-height: 1.4; margin: 6px 0;">
-      White to move: try e4!
-    </p>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 18px 0;">
-
-      <button onclick="dychessCheckPuzzle()"
-        style="padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">
-        Check Answer
-      </button>
-
-      <button onclick="dychessShowHint()"
-        style="padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">
-        Show Hint
-      </button>
-
-      <button onclick="dychessResetPuzzle()"
-        style="padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">
-        Reset Puzzle
-      </button>
-
-    </div>
-
-    <div style="background: #f2f5f8; border-radius: 8px; padding: 6px 10px; margin-top: 6px;">
-  <p style="color: #111; font-size: 13px; margin: 0;">
-    🏆 Puzzles solved: <strong id="dychessPuzzleScore">0</strong>
-  </p>
-  <p style="color: #111; font-size: 13px; margin: 3px 0 0;">
-    ⭐ Puzzle points: <strong id="dychessPuzzlePoints">0</strong>
-  </p>
-</div>
-
-  </div>
-</div>
-  </div>
 </section>
 
 <section class="section" id="hall" style="padding: 10px 0;">

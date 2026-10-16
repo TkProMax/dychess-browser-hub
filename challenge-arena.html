@@ -1,1 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07110d">
+  <title>DYCHESS Challenge Arena</title>
 
+  <style>
+    :root {
+      --bg: #07110d;
+      --panel: #101c16;
+      --panel-light: #17251c;
+      --gold: #d9b45b;
+      --green: #1e6b46;
+      --text: #f4f5ef;
+      --muted: #a9b5aa;
+      --border: rgba(217, 180, 91, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--gold); text-decoration: none; }
+
+    header {
+      background: #0b1710;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 20px;
+    }
+
+    .nav {
+      max-width: 1050px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--gold);
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      font-size: 1.15rem;
+    }
+
+    .back-link { font-size: 0.9rem; }
+
+    main {
+      width: min(920px, 92%);
+      margin: 36px auto;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 28px 12px 32px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.3rem);
+      line-height: 1.15;
+      margin: 12px 0;
+    }
+
+    .intro {
+      max-width: 600px;
+      margin: 0 auto;
+      color: var(--muted);
+    }
+
+    .panel {
+      background: linear-gradient(145deg, var(--panel), #0c1610);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .panel h2 { margin-top: 0; }
+
+    .status {
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--panel-light);
+      color: var(--muted);
+    }
+
+    .gold { color: var(--gold); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 560px) {
+      .panel { padding: 18px; }
+      main { margin-top: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="nav">
+      <a class="brand" href="index.html">♟ DYCHESS</a>
+      <a class="back-link" href="index.html">← Back to Hub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">The Home of DYCHESS</div>
+      <h1>⚔️ Challenge Arena</h1>
+      <p class="intro">
+        Challenge your rivals, play your game, and build your DYCHESS legacy.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>♟️ Arena Challenges</h2>
+      <div class="status">
+        <span class="gold">Arena setup in progress</span>
+        <p>
+          The challenge board will appear here once we connect your
+          registered DYCHESS players.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>🏆 Recent Results</h2>
+      <div class="status">
+        Completed challenge results will appear here.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 DYCHESS. Built for the community.
+  </footer>
+</body>
+</html>

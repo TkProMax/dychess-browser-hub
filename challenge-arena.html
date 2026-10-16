@@ -404,42 +404,100 @@ window.dychessDB = window.supabase.createClient(
   }
 
   function renderChallenges(container, challenges, otherPlayerField) {
-    container.replaceChildren();
+  container.replaceChildren();
 
-    if (!challenges.length) {
-      showMessage(container, 'No challenges found yet.');
-      return;
+  if (!challenges.length) {
+    showMessage(container, 'No challenges found yet.');
+    return;
+  }
+
+  challenges.forEach(challenge => {
+    const card = document.createElement('div');
+    card.style.cssText =
+      'padding:14px;margin:10px 0;border:1px solid #d9b45b;border-radius:10px;background:#17251c;';
+
+    const title = document.createElement('strong');
+    const otherId = challenge[otherPlayerField];
+    title.textContent = names[otherId] || 'DYCHESS Player';
+    card.appendChild(title);
+
+    const details = document.createElement('p');
+    details.style.color = '#a9b5aa';
+    details.textContent =
+      challenge.game_format + ' · Status: ' + challenge.status;
+    card.appendChild(details);
+
+    if (challenge.lichess_url) {
+      const link = document.createElement('a');
+      link.href = challenge.lichess_url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Open Lichess challenge';
+      link.style.color = '#d9b45b';
+      card.appendChild(link);
     }
 
-    challenges.forEach(challenge => {
-      const card = document.createElement('div');
-      card.style.cssText =
-        'padding:14px;margin:10px 0;border:1px solid #d9b45b;border-radius:10px;background:#17251c;';
+    // Incoming challenges show Accept and Decline buttons.
+    if (
+      otherPlayerField === 'challenger_id' &&
+      challenge.status === 'pending'
+    ) {
+      const actions = document.createElement('div');
+      actions.style.cssText =
+        'display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;';
 
-      const title = document.createElement('strong');
-      const otherId = challenge[otherPlayerField];
-      title.textContent = names[otherId] || 'DYCHESS Player';
-      card.appendChild(title);
+      async function respondToChallenge(newStatus, button) {
+        button.disabled = true;
+        details.textContent = 'Updating challenge...';
 
-      const details = document.createElement('p');
-      details.style.color = '#a9b5aa';
-      details.textContent =
-        challenge.game_format + ' · Status: ' + challenge.status;
-      card.appendChild(details);
+        const { data, error } = await window.dychessDB
+          .from('arena_challenges')
+          .update({ status: newStatus })
+          .eq('id', challenge.id)
+          .eq('status', 'pending')
+          .select('id')
+          .maybeSingle();
 
-      if (challenge.lichess_url) {
-        const link = document.createElement('a');
-        link.href = challenge.lichess_url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'Open Lichess challenge';
-        link.style.color = '#d9b45b';
-        card.appendChild(link);
+        if (error || !data) {
+          console.error('Could not update challenge:', error);
+          details.textContent =
+            'Could not update challenge. Please refresh and try again.';
+          button.disabled = false;
+          return;
+        }
+
+        challenge.status = newStatus;
+        details.textContent =
+          challenge.game_format + ' · Status: ' + newStatus;
+
+        actions.remove();
       }
 
-      container.appendChild(card);
-    });
-  }
+      const acceptButton = document.createElement('button');
+      acceptButton.type = 'button';
+      acceptButton.textContent = '✓ Accept';
+      acceptButton.style.cssText =
+        'padding:10px 16px;border:1px solid #d9b45b;border-radius:8px;background:#1e6b46;color:#fff;cursor:pointer;';
+      acceptButton.addEventListener('click', () =>
+        respondToChallenge('accepted', acceptButton)
+      );
+
+      const declineButton = document.createElement('button');
+      declineButton.type = 'button';
+      declineButton.textContent = '✕ Decline';
+      declineButton.style.cssText =
+        'padding:10px 16px;border:1px solid #d9b45b;border-radius:8px;background:#07110d;color:#f4f5ef;cursor:pointer;';
+      declineButton.addEventListener('click', () =>
+        respondToChallenge('declined', declineButton)
+      );
+
+      actions.append(acceptButton, declineButton);
+      card.appendChild(actions);
+    }
+
+    container.appendChild(card);
+  });
+}
 
   async function loadChallenges(select, container, field, otherField) {
     const playerId = select.value;

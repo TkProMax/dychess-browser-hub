@@ -177,6 +177,29 @@
   </form>
 </section>
 
+<section class="panel">
+  <h2>📥 Incoming Challenges</h2>
+  <label for="incomingPlayerSelect">Show challenges for</label>
+  <select id="incomingPlayerSelect"
+    style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
+    <option value="">Choose your DYCHESS username</option>
+  </select>
+  <div id="incomingChallengesList" class="status">
+    Select your username to view incoming challenges.
+  </div>
+</section>
+
+<section class="panel">
+  <h2>📤 My Sent Challenges</h2>
+  <label for="sentPlayerSelect">Show challenges sent by</label>
+  <select id="sentPlayerSelect"
+    style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
+    <option value="">Choose your DYCHESS username</option>
+  </select>
+  <div id="sentChallengesList" class="status">
+    Select your username to view sent challenges.
+  </div>
+</section>
     <section class="panel">
       <h2>🏆 Recent Results</h2>
       <div class="status">
@@ -342,6 +365,147 @@ window.dychessDB = window.supabase.createClient(
       button.disabled = false;
     }
   });
+})();
+</script>
+<script>
+(async function setupArenaChallengeLists() {
+  const incomingSelect = document.getElementById('incomingPlayerSelect');
+  const sentSelect = document.getElementById('sentPlayerSelect');
+  const incomingList = document.getElementById('incomingChallengesList');
+  const sentList = document.getElementById('sentChallengesList');
+  const db = window.dychessDB;
+
+  if (!incomingSelect || !sentSelect || !db) return;
+
+  let players = [];
+  const names = {};
+
+  function showMessage(container, text) {
+    container.replaceChildren();
+    const p = document.createElement('p');
+    p.textContent = text;
+    container.appendChild(p);
+  }
+
+  function addPlayerOptions(select) {
+    select.replaceChildren();
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Choose your DYCHESS username';
+    select.appendChild(placeholder);
+
+    players.forEach(player => {
+      const option = document.createElement('option');
+      option.value = player.id;
+      option.textContent =
+        player.display_name || player.lichess_username || 'DYCHESS Player';
+      select.appendChild(option);
+    });
+  }
+
+  function renderChallenges(container, challenges, otherPlayerField) {
+    container.replaceChildren();
+
+    if (!challenges.length) {
+      showMessage(container, 'No challenges found yet.');
+      return;
+    }
+
+    challenges.forEach(challenge => {
+      const card = document.createElement('div');
+      card.style.cssText =
+        'padding:14px;margin:10px 0;border:1px solid #d9b45b;border-radius:10px;background:#17251c;';
+
+      const title = document.createElement('strong');
+      const otherId = challenge[otherPlayerField];
+      title.textContent = names[otherId] || 'DYCHESS Player';
+      card.appendChild(title);
+
+      const details = document.createElement('p');
+      details.style.color = '#a9b5aa';
+      details.textContent =
+        challenge.game_format + ' · Status: ' + challenge.status;
+      card.appendChild(details);
+
+      if (challenge.lichess_url) {
+        const link = document.createElement('a');
+        link.href = challenge.lichess_url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = 'Open Lichess challenge';
+        link.style.color = '#d9b45b';
+        card.appendChild(link);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  async function loadChallenges(select, container, field, otherField) {
+    const playerId = select.value;
+
+    if (!playerId) {
+      showMessage(container, 'Choose your username to view challenges.');
+      return;
+    }
+
+    showMessage(container, 'Loading challenges...');
+
+    const { data, error } = await db
+      .from('arena_challenges')
+      .select('id, challenger_id, opponent_id, game_format, lichess_url, status, created_at')
+      .eq(field, playerId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Could not load challenges:', error);
+      showMessage(container, 'Could not load challenges. Please try again.');
+      return;
+    }
+
+    renderChallenges(container, data || [], otherField);
+  }
+
+  try {
+    const { data, error } = await db
+      .from('players')
+      .select('id, display_name, lichess_username')
+      .order('display_name');
+
+    if (error) throw error;
+
+    players = data || [];
+
+    players.forEach(player => {
+      names[player.id] =
+        player.display_name || player.lichess_username || 'DYCHESS Player';
+    });
+
+    addPlayerOptions(incomingSelect);
+    addPlayerOptions(sentSelect);
+
+    incomingSelect.addEventListener('change', () =>
+      loadChallenges(
+        incomingSelect,
+        incomingList,
+        'opponent_id',
+        'challenger_id'
+      )
+    );
+
+    sentSelect.addEventListener('change', () =>
+      loadChallenges(
+        sentSelect,
+        sentList,
+        'challenger_id',
+        'opponent_id'
+      )
+    );
+  } catch (error) {
+    console.error('Could not prepare challenge lists:', error);
+    showMessage(incomingList, 'Could not load registered players.');
+    showMessage(sentList, 'Could not load registered players.');
+  }
 })();
 </script>
 </body>

@@ -135,13 +135,47 @@
      
     </section>
 
-    <section class="panel">
-      <h2>♟️ Arena Challenges</h2>
-      <div class="status">
-        <span class="gold">Arena setup in progress</span>
-        
-      </div>
-    </section>
+   <section class="panel">
+  <h2>♟️ Arena Challenges</h2>
+  <p style="color:#a9b5aa;">
+    Choose registered DYCHESS players and set up a challenge.
+  </p>
+
+  <form id="arenaChallengeForm">
+    <label for="challengerSelect">Your DYCHESS username</label>
+    <select id="challengerSelect" required
+      style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
+      <option value="">Loading registered players...</option>
+    </select>
+
+    <label for="opponentSelect">Choose your opponent</label>
+    <select id="opponentSelect" required
+      style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
+      <option value="">Select an opponent</option>
+    </select>
+
+    <label for="arenaFormat">Game format</label>
+    <select id="arenaFormat" required
+      style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
+      <option value="Bullet">Bullet</option>
+      <option value="Blitz" selected>Blitz</option>
+      <option value="Rapid">Rapid</option>
+      <option value="Classical">Classical</option>
+    </select>
+
+    <label for="arenaLichessUrl">Lichess challenge link (optional)</label>
+    <input id="arenaLichessUrl" type="url"
+      placeholder="https://lichess.org/..."
+      style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
+
+    <button type="submit" class="btn btn-primary">
+      ⚔️ Send Challenge
+    </button>
+
+    <p id="arenaFormMessage" role="status"
+      style="color:#d9b45b;margin-top:14px;"></p>
+  </form>
+</section>
 
     <section class="panel">
       <h2>🏆 Recent Results</h2>
@@ -163,6 +197,152 @@ window.dychessDB = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+</script>
+
+<script>
+(async function loadArenaPlayers() {
+  const db = window.dychessDB;
+  const challengerSelect = document.getElementById('challengerSelect');
+  const opponentSelect = document.getElementById('opponentSelect');
+  const message = document.getElementById('arenaFormMessage');
+
+  try {
+    const { data, error } = await db
+      .from('players')
+      .select('id, display_name, lichess_username')
+      .order('display_name');
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      challengerSelect.innerHTML =
+        '<option value="">No registered players found</option>';
+      opponentSelect.innerHTML =
+        '<option value="">No registered players found</option>';
+      message.textContent = 'No registered DYCHESS players were found.';
+      return;
+    }
+
+    const players = data.filter(player =>
+      player.display_name || player.lichess_username
+    );
+
+    function playerName(player) {
+      return player.display_name || player.lichess_username;
+    }
+
+    function fillSelect(select, placeholder) {
+      select.innerHTML = '';
+      const first = document.createElement('option');
+      first.value = '';
+      first.textContent = placeholder;
+      select.appendChild(first);
+
+      players.forEach(player => {
+        const option = document.createElement('option');
+        option.value = player.id;
+        option.textContent = playerName(player);
+        select.appendChild(option);
+      });
+    }
+
+    fillSelect(challengerSelect, 'Choose your username');
+    fillSelect(opponentSelect, 'Choose an opponent');
+
+    challengerSelect.addEventListener('change', () => {
+      const selected = challengerSelect.value;
+      Array.from(opponentSelect.options).forEach(option => {
+        option.disabled = option.value !== '' && option.value === selected;
+      });
+
+      if (opponentSelect.value === selected) {
+        opponentSelect.value = '';
+      }
+    });
+
+    message.textContent = 'Registered players loaded. Choose your players.';
+  } catch (error) {
+    console.error('Could not load Arena players:', error);
+    challengerSelect.innerHTML =
+      '<option value="">Could not load players</option>';
+    opponentSelect.innerHTML =
+      '<option value="">Could not load players</option>';
+    message.textContent =
+      'Could not load registered players. Please try again later.';
+  }
+})();
+</script>
+<script>
+(function setupArenaSubmission() {
+  const form = document.getElementById('arenaChallengeForm');
+  const challenger = document.getElementById('challengerSelect');
+  const opponent = document.getElementById('opponentSelect');
+  const format = document.getElementById('arenaFormat');
+  const link = document.getElementById('arenaLichessUrl');
+  const message = document.getElementById('arenaFormMessage');
+  const button = form.querySelector('button[type="submit"]');
+
+  form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const challengerId = challenger.value;
+    const opponentId = opponent.value;
+    const lichessUrl = link.value.trim();
+
+    if (!challengerId || !opponentId) {
+      message.textContent = 'Please select both players.';
+      return;
+    }
+
+    if (challengerId === opponentId) {
+      message.textContent = 'You cannot challenge yourself.';
+      return;
+    }
+
+    if (lichessUrl) {
+      try {
+        const parsedUrl = new URL(lichessUrl);
+        if (
+          parsedUrl.protocol !== 'https:' ||
+          parsedUrl.hostname !== 'lichess.org'
+        ) {
+          message.textContent =
+            'Please enter a valid https://lichess.org challenge link.';
+          return;
+        }
+      } catch {
+        message.textContent = 'Please enter a valid Lichess link.';
+        return;
+      }
+    }
+
+    button.disabled = true;
+    message.textContent = 'Sending challenge...';
+
+    try {
+      const { error } = await window.dychessDB
+        .from('arena_challenges')
+        .insert({
+          challenger_id: challengerId,
+          opponent_id: opponentId,
+          game_format: format.value,
+          lichess_url: lichessUrl || null
+        });
+
+      if (error) throw error;
+
+      message.textContent =
+        'Challenge submitted! Its status is Pending.';
+      link.value = '';
+    } catch (error) {
+      console.error('Challenge submission failed:', error);
+      message.textContent =
+        'Could not submit the challenge. Please try again.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
 </script>
 </body>
 </html>

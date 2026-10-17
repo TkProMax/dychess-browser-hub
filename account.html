@@ -239,7 +239,60 @@
         }
       }
     );
+  const LICHESS_CLIENT_ID = window.location.hostname;
+const LICHESS_REDIRECT_URI =
+  window.location.origin + window.location.pathname;
+function base64UrlEncode(bytes) {
+  let binary = "";
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
 
+async function createLichessPkce() {
+  const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+  const verifier = base64UrlEncode(randomBytes);
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(verifier)
+  );
+
+  return {
+    verifier,
+    challenge: base64UrlEncode(new Uint8Array(digest))
+  };
+}
+    async function connectLichess() {
+  const { data } = await client.auth.getSession();
+
+  if (!data.session) {
+    showStatus("Please sign in to your DYCHESS account first.");
+    return;
+  }
+
+  const { verifier, challenge } = await createLichessPkce();
+  const state = base64UrlEncode(
+    crypto.getRandomValues(new Uint8Array(24))
+  );
+
+  sessionStorage.setItem("dychess_lichess_verifier", verifier);
+  sessionStorage.setItem("dychess_lichess_state", state);
+
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: LICHESS_CLIENT_ID,
+    redirect_uri: LICHESS_REDIRECT_URI,
+    code_challenge_method: "S256",
+    code_challenge: challenge,
+    state: state
+  });
+
+  window.location.href = "https://lichess.org/oauth?" + params.toString();
+}
     const $ = (id) => document.getElementById(id);
 
     let mode = "register";

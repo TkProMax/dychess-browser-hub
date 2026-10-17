@@ -290,46 +290,19 @@
       setMode("login");
     });
 
-    async function ensureAccountProfile(user) {
-      const { data: existing, error: lookupError } = await client
-        .from("dychess_accounts")
-        .select("id, username")
-        .eq("id", user.id)
-        .maybeSingle();
+   async function ensureAccountProfile(user) {
+  const { data: existing, error } = await client
+    .from("dychess_accounts")
+    .select("id, username")
+    .eq("id", user.id)
+    .maybeSingle();
 
-      if (lookupError) throw lookupError;
+  if (error) throw error;
 
-      if (existing) return existing;
-
-      const username = user.user_metadata?.dychess_username;
-
-      if (!username) {
-        throw new Error(
-          "Your account profile is missing a username. Contact DYCHESS Support."
-        );
-      }
-
-      const { data, error } = await client
-        .from("dychess_accounts")
-        .insert({
-          id: user.id,
-          username: username
-        })
-        .select("id, username")
-        .single();
-
-      if (error) {
-        if (error.code === "23505") {
-          throw new Error(
-            "That username is already registered to a DYCHESS account. " +
-            "If this is your username, contact DYCHESS Support for help."
-          );
-        }
-        throw error;
-      }
-
-      return data;
-    }
+  // Never create a profile from a username typed during registration.
+  // A new profile must be created after server-side Lichess verification.
+  return existing || null;
+}
 
     async function displaySession(user) {
       if (!user) {

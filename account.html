@@ -453,6 +453,39 @@ $("forgotPasswordBtn").addEventListener("click", async () => {
     button.textContent = "Forgot password?";
   }
 });
+  $("passwordResetForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const newPassword = $("newPassword").value;
+  const button = $("saveNewPasswordBtn");
+
+  if (newPassword.length < 8) {
+    showStatus("Your new password must be at least 8 characters.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Updating password...";
+
+  try {
+    const { error } = await client.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) throw error;
+
+    $("passwordResetPanel").classList.add("hidden");
+    $("authPanel").classList.remove("hidden");
+    $("newPassword").value = "";
+
+    showStatus("Password updated successfully. You can now sign in.");
+  } catch (error) {
+    showStatus(error.message || "Unable to update your password.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Update password";
+  }
+});
    async function ensureAccountProfile(user) {
   const { data: existing, error } = await client
     .from("dychess_accounts")

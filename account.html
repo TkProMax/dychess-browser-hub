@@ -349,6 +349,59 @@ async function createLichessPkce() {
     $("loginTab").addEventListener("click", () => {
       setMode("login");
     });
+  
+$("accountForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (busy) return;
+
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  setBusy(true);
+
+  try {
+    if (mode === "register") {
+      const { data, error } = await client.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo:
+            window.location.origin + window.location.pathname
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session && data.user) {
+        await displaySession(data.user);
+        showStatus(
+          "Account created. Next, connect your Lichess account to verify your identity."
+        );
+      } else {
+        showStatus(
+          "Registration received. Check your email to confirm your account before signing in."
+        );
+      }
+    } else {
+      const { data, error } =
+        await client.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) throw error;
+
+      if (data.user) {
+        await displaySession(data.user);
+      }
+    }
+  } catch (error) {
+    showStatus(error.message || "Authentication failed. Please try again.");
+  } finally {
+    setBusy(false);
+  }
+});
 
    async function ensureAccountProfile(user) {
   const { data: existing, error } = await client

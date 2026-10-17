@@ -209,10 +209,15 @@
 <section class="panel">
   <h2>📤 My Sent Challenges</h2>
   <label for="sentPlayerSelect">Check your sent challenges</label>
-  <select id="sentPlayerSelect"
-    style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
-    <option value="">Choose your DYCHESS username</option>
-  </select>
+ <input
+  id="sentPlayerSearch"
+  type="text"
+  list="sentPlayerOptions"
+  placeholder="Type your DYCHESS username to search"
+  autocomplete="off"
+  style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;"
+>
+<datalist id="sentPlayerOptions"></datalist>
   <div id="sentChallengesList" class="status">
     Select your username to view sent challenges.
   </div>
@@ -396,7 +401,8 @@ window.dychessDB = window.supabase.createClient(
 (async function setupArenaChallengeLists() {
 const incomingSearch = document.getElementById('incomingPlayerSearch');
 const incomingOptions = document.getElementById('incomingPlayerOptions');
-  const sentSelect = document.getElementById('sentPlayerSelect');
+  const sentSearch = document.getElementById('sentPlayerSearch');
+const sentOptions = document.getElementById('sentPlayerOptions');
   const incomingList = document.getElementById('incomingChallengesList');
   const sentList = document.getElementById('sentChallengesList');
   const db = window.dychessDB;
@@ -579,8 +585,17 @@ players.forEach(player => {
     incomingOptions.appendChild(option);
   });
 });
-    addPlayerOptions(sentSelect);
+   sentOptions.replaceChildren();
 
+players.forEach(player => {
+  [player.display_name, player.lichess_username]
+    .filter(Boolean)
+    .forEach(name => {
+      const option = document.createElement('option');
+      option.value = name;
+      sentOptions.appendChild(option);
+    });
+});
     incomingSearch.addEventListener('input', () => {
   const typedName = incomingSearch.value.trim().toLowerCase();
 
@@ -621,14 +636,45 @@ async function incomingSelectForSearch(playerId) {
   renderChallenges(incomingList, data || [], 'challenger_id');
 }
 
-    sentSelect.addEventListener('change', () =>
-      loadChallenges(
-        sentSelect,
-        sentList,
-        'challenger_id',
-        'opponent_id'
-      )
+  sentSearch.addEventListener('input', () => {
+  const typedName = sentSearch.value.trim().toLowerCase();
+
+  const player = players.find(player =>
+    [player.display_name, player.lichess_username]
+      .filter(Boolean)
+      .some(name => name.toLowerCase() === typedName)
+  );
+
+  if (!player) {
+    showMessage(
+      sentList,
+      typedName
+        ? 'Select or type a registered DYCHESS username.'
+        : 'Type your DYCHESS username to view sent challenges.'
     );
+    return;
+  }
+
+  loadSentChallenges(player.id);
+});
+
+async function loadSentChallenges(playerId) {
+  showMessage(sentList, 'Loading sent challenges...');
+
+  const { data, error } = await db
+    .from('arena_challenges')
+    .select('id, challenger_id, opponent_id, game_format, lichess_url, status, created_at')
+    .eq('challenger_id', playerId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Could not load sent challenges:', error);
+    showMessage(sentList, 'Could not load sent challenges. Please try again.');
+    return;
+  }
+
+  renderChallenges(sentList, data || [], 'opponent_id');
+}
   } catch (error) {
     console.error('Could not prepare challenge lists:', error);
     showMessage(incomingList, 'Could not load registered players.');

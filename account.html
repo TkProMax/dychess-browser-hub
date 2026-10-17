@@ -7,15 +7,16 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
+ <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
       padding: 24px 16px;
       font-family: Arial, sans-serif;
-      background: #f4f7f5;
-      color: #17251c;
+      background: #07140e;
+      color: #f4f5ef;
+      min-height: 100vh;
     }
 
     .container {
@@ -30,50 +31,75 @@
 
     .brand h1 {
       margin-bottom: 8px;
-      color: #164b32;
+      color: #d9b45b;
+      letter-spacing: 1px;
+    }
+
+    .brand p {
+      color: #c1cbbf;
     }
 
     .card {
-      background: white;
-      border: 1px solid #dce5df;
+      background: #10251a;
+      border: 1px solid #806a35;
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 8px 28px rgba(20, 50, 35, .07);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, .35);
+    }
+
+    h2 {
+      color: #e0bd67;
     }
 
     label {
       display: block;
       font-weight: 600;
       margin: 16px 0 7px;
+      color: #f4f5ef;
     }
 
     input {
       width: 100%;
       padding: 12px;
-      border: 1px solid #cbd5ce;
+      border: 1px solid #536b59;
       border-radius: 8px;
       font-size: 16px;
-      background: white;
-      color: #17251c;
+      background: #09180f;
+      color: #ffffff;
+    }
+
+    input:focus {
+      outline: 2px solid #d9b45b;
+      border-color: #d9b45b;
+    }
+
+    input::placeholder {
+      color: #9eada1;
     }
 
     button {
       width: 100%;
       padding: 13px;
       margin-top: 14px;
-      border: 0;
+      border: 1px solid #d9b45b;
       border-radius: 8px;
-      background: #164b32;
-      color: white;
+      background: #d9b45b;
+      color: #10160f;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: #edcf7b;
+      transform: translateY(-1px);
     }
 
     button.secondary {
-      background: #e9f0eb;
-      color: #164b32;
-      border: 1px solid #cbd8cf;
+      background: #172f21;
+      color: #e4c66e;
+      border: 1px solid #806a35;
     }
 
     button:disabled {
@@ -89,17 +115,19 @@
 
     .switch button {
       margin-top: 0;
-      background: #edf2ee;
-      color: #164b32;
+      background: #172f21;
+      color: #d8e1d8;
+      border: 1px solid #3c5944;
     }
 
     .switch button.active {
-      background: #164b32;
-      color: white;
+      background: #d9b45b;
+      color: #10160f;
+      border-color: #d9b45b;
     }
 
     .hint {
-      color: #59685e;
+      color: #c1cbbf;
       font-size: 14px;
       line-height: 1.5;
     }
@@ -107,8 +135,10 @@
     #status {
       margin-top: 16px;
       padding: 12px;
+      border: 1px solid #536b59;
       border-radius: 8px;
-      background: #edf2ee;
+      background: #172f21;
+      color: #f4f5ef;
       line-height: 1.5;
       overflow-wrap: anywhere;
     }
@@ -117,13 +147,19 @@
 
     .hidden { display: none !important; }
 
-    a { color: #164b32; }
+    a {
+      color: #e0bd67;
+    }
+
+    a:hover {
+      color: #f2d88c;
+    }
 
     .back {
       text-align: center;
       margin-top: 20px;
     }
-  </style>
+</style>
 </head>
 
 <body>

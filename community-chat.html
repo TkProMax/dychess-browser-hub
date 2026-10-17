@@ -1,1 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f3">
+  <title>DYCHESS Community Chat</title>
 
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f3;
+      color: #24342a;
+    }
+
+    header {
+      background: #173e2b;
+      color: white;
+      padding: 22px 16px;
+      border-bottom: 4px solid #d9b45b;
+    }
+
+    .header-inner, main, footer {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    header a {
+      color: #f0d58a;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    h1 {
+      margin: 14px 0 7px;
+      font-size: clamp(25px, 5vw, 34px);
+    }
+
+    header p {
+      color: #e0e9e1;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    main { padding: 22px 14px; }
+
+    .panel {
+      background: white;
+      border: 1px solid #dce4dc;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px #173e2b0a;
+    }
+
+    h2 {
+      color: #173e2b;
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .muted {
+      color: #657369;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input, textarea {
+      display: block;
+      width: 100%;
+      border: 1px solid #cbd6cc;
+      border-radius: 9px;
+      background: #fbfcfa;
+      color: #24342a;
+      padding: 12px;
+      font: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: 2px solid #d9b45b;
+      border-color: #173e2b;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 95px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 17px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .primary {
+      background: #173e2b;
+      color: white;
+    }
+
+    .secondary {
+      background: #f3e8c8;
+      color: #173e2b;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    #messages {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .message {
+      background: #f7f9f6;
+      border: 1px solid #e0e7df;
+      border-left: 4px solid #d9b45b;
+      border-radius: 9px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .message-head {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .message-name {
+      color: #173e2b;
+      font-weight: 700;
+    }
+
+    .message-time {
+      color: #778278;
+      font-size: 12px;
+    }
+
+    .message-text {
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .error { color: #a12d2d; }
+    .success { color: #17613a; }
+
+    .notice {
+      background: #fff8e7;
+      border: 1px solid #ead7a6;
+      border-radius: 9px;
+      padding: 12px;
+      color: #5e4a1e;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 15px;
+    }
+
+    footer {
+      padding: 8px 14px 28px;
+      color: #68756b;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    footer a { color: #173e2b; }
+
+    @media (max-width: 500px) {
+      .panel { padding: 14px; }
+      .message-head { flex-direction: column; gap: 4px; }
+      .actions button { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="index.html">← Back to DYCHESS Hub</a>
+      <h1>♟️ DYCHESS Community Chat</h1>
+      <p>Connect with the community. Talk chess. Build your legacy.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Join the conversation</h2>
+      <p class="muted">
+        Choose a display name and join the public DYCHESS conversation.
+        No account is required.
+      </p>
+
+      <label for="displayName">Your display name</label>
+      <input
+        id="displayName"
+        type="text"
+        minlength="2"
+        maxlength="24"
+        placeholder="Choose a display name"
+        autocomplete="nickname"
+      >
+
+      <label for="messageInput">Your message</label>
+      <textarea
+        id="messageInput"
+        maxlength="500"
+        placeholder="Write something for the DYCHESS community..."
+      ></textarea>
+
+      <div class="actions">
+        <button id="sendButton" class="primary" type="button">
+          Send message →
+        </button>
+        <button id="refreshButton" class="secondary" type="button">
+          Refresh messages
+        </button>
+      </div>
+
+      <div id="status" role="status" aria-live="polite"></div>
+
+      <div class="notice">
+        Keep the chat respectful. Display names are not verified identities.
+        Avoid sharing passwords, private information, or abusive content.
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Community messages</h2>
+      <p class="muted">Public messages from DYCHESS visitors.</p>
+      <div id="messages" aria-live="polite">
+        <p class="muted">Connecting to the DYCHESS chat...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 DYCHESS. Built for the community.
+    <br><a href="index.html">Return to DYCHESS Hub</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL =
+      "https://puogdezkkgcgaxyzofoe.supabase.co";
+
+    // Replace this placeholder with the publishable key from your
+    // existing DYCHESS index.html. Never use a secret key here.
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cKWMrNF-V40TZpdQp-ln6g_UvwbINQy";
+
+    const SEND_FUNCTION_URL =
+      SUPABASE_URL + "/functions/v1/send-community-message";
+
+    const nameInput = document.getElementById("displayName");
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const refreshButton = document.getElementById("refreshButton");
+    const messagesBox = document.getElementById("messages");
+    const statusBox = document.getElementById("status");
+
+    let db = null;
+    let channel = null;
+    let sending = false;
+
+    function setStatus(message, type = "") {
+      statusBox.textContent = message;
+      statusBox.className = type;
+    }
+
+    function renderMessage(item) {
+      const card = document.createElement("article");
+      card.className = "message";
+
+      const head = document.createElement("div");
+      head.className = "message-head";
+
+      const name = document.createElement("span");
+      name.className = "message-name";
+      name.textContent = item.display_name;
+
+      const time = document.createElement("time");
+      time.className = "message-time";
+
+      const date = new Date(item.created_at);
+      time.dateTime = date.toISOString();
+      time.textContent = date.toLocaleString();
+
+      const content = document.createElement("div");
+      content.className = "message-text";
+      content.textContent = item.message;
+
+      head.append(name, time);
+      card.append(head, content);
+      return card;
+    }
+
+    function showMessages(items) {
+      messagesBox.replaceChildren();
+
+      if (!items || items.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.textContent =
+          "No messages yet. Be the first to start the conversation!";
+        messagesBox.append(empty);
+        return;
+      }
+
+      items.forEach(item => messagesBox.append(renderMessage(item)));
+    }
+
+    async function loadMessages() {
+      if (!db) return;
+
+      const { data, error } = await db
+        .from("community_messages")
+        .select("id, display_name, message, created_at")
+        .eq("is_hidden", false)
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (error) {
+        console.error("Unable to load chat messages.");
+        messagesBox.textContent =
+          "Unable to load messages. Please try refreshing.";
+        return;
+      }
+
+      showMessages((data || []).reverse());
+    }
+
+    async function sendMessage() {
+      if (sending) return;
+
+      const displayName = nameInput.value.trim();
+      const message = messageInput.value.trim();
+
+      if (displayName.length < 2 || displayName.length > 24) {
+        setStatus("Your display name must be 2–24 characters.", "error");
+        nameInput.focus();
+        return;
+      }
+
+      if (message.length < 1 || message.length > 500) {
+        setStatus("Your message must be 1–500 characters.", "error");
+        messageInput.focus();
+        return;
+      }
+
+      if (
+        !SUPABASE_PUBLISHABLE_KEY ||
+        SUPABASE_PUBLISHABLE_KEY === "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+      ) {
+        setStatus(
+          "Setup needed: add the existing Supabase publishable key.",
+          "error"
+        );
+        return;
+      }
+
+      sending = true;
+      sendButton.disabled = true;
+      setStatus("Sending message...");
+
+      try {
+        const response = await fetch(SEND_FUNCTION_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({
+            display_name: displayName,
+            message: message
+          })
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Message could not be sent. Please try again."
+          );
+        }
+
+        localStorage.setItem("dychess_chat_display_name", displayName);
+        messageInput.value = "";
+        setStatus("Message sent successfully!", "success");
+        await loadMessages();
+      } catch (error) {
+        setStatus(error.message || "Unable to send your message.", "error");
+      } finally {
+        sending = false;
+        sendButton.disabled = false;
+      }
+    }
+
+    async function startChat() {
+      if (typeof window.supabase === "undefined") {
+        setStatus("The chat library could not load. Refresh and try again.", "error");
+        messagesBox.textContent = "Chat connection unavailable.";
+        return;
+      }
+
+      if (
+        !SUPABASE_PUBLISHABLE_KEY ||
+        SUPABASE_PUBLISHABLE_KEY === "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+      ) {
+        setStatus("Add your existing Supabase publishable key to finish setup.", "error");
+        messagesBox.textContent = "Chat setup is not finished yet.";
+        return;
+      }
+
+      db = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+      await loadMessages();
+
+      channel = db
+        .channel("dychess-community-chat")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "community_messages"
+          },
+          async () => {
+            await loadMessages();
+          }
+        )
+        .subscribe((state) => {
+          if (state === "SUBSCRIBED") {
+            setStatus("Connected to DYCHESS Community Chat.", "success");
+          } else if (state === "CHANNEL_ERROR") {
+            setStatus(
+              "Live updates could not connect. You can still refresh messages.",
+              "error"
+            );
+          }
+        });
+    }
+
+    nameInput.value =
+      localStorage.getItem("dychess_chat_display_name") || "";
+
+    sendButton.addEventListener("click", sendMessage);
+    refreshButton.addEventListener("click", loadMessages);
+
+    messageInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    startChat();
+  </script>
+</body>
+</html>

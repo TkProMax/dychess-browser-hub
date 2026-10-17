@@ -530,30 +530,7 @@ const sentOptions = document.getElementById('sentPlayerOptions');
   });
 }
 
-  async function loadChallenges(select, container, field, otherField) {
-    const playerId = select.value;
-
-    if (!playerId) {
-      showMessage(container, 'Choose your username to view challenges.');
-      return;
-    }
-
-    showMessage(container, 'Loading challenges...');
-
-    const { data, error } = await db
-      .from('arena_challenges')
-      .select('id, challenger_id, opponent_id, game_format, lichess_url, status, created_at')
-      .eq(field, playerId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Could not load challenges:', error);
-      showMessage(container, 'Could not load challenges. Please try again.');
-      return;
-    }
-
-    renderChallenges(container, data || [], otherField);
-  }
+ 
 
   try {
     const { data, error } = await db

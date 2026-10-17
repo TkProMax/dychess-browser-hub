@@ -407,8 +407,7 @@ const sentOptions = document.getElementById('sentPlayerOptions');
   const sentList = document.getElementById('sentChallengesList');
   const db = window.dychessDB;
 
-  if (!incomingSearch || !incomingOptions || !sentSelect || !db) return;
-
+ if (!incomingSearch || !incomingOptions || !sentSearch || !sentOptions || !db) return;
   let players = [];
   const names = {};
 

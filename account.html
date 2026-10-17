@@ -404,7 +404,36 @@ $("accountForm").addEventListener("submit", async (event) => {
     setBusy(false);
   }
 });
+$("forgotPasswordBtn").addEventListener("click", async () => {
+  const email = $("email").value.trim();
 
+  if (!email) {
+    showStatus("Enter your email address first, then click Forgot password.");
+    $("email").focus();
+    return;
+  }
+
+  const button = $("forgotPasswordBtn");
+  button.disabled = true;
+  button.textContent = "Sending reset email...";
+
+  try {
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+
+    if (error) throw error;
+
+    showStatus(
+      "If this email has a DYCHESS account, a password-reset email will be sent. Check your inbox and spam folder."
+    );
+  } catch (error) {
+    showStatus(error.message || "Unable to request a password reset.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Forgot password?";
+  }
+});
    async function ensureAccountProfile(user) {
   const { data: existing, error } = await client
     .from("dychess_accounts")

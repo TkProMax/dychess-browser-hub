@@ -381,7 +381,7 @@ const incomingOptions = document.getElementById('incomingPlayerOptions');
   const sentList = document.getElementById('sentChallengesList');
   const db = window.dychessDB;
 
-  if (!incomingSelect || !sentSelect || !db) return;
+  if (!incomingSearch || !incomingOptions || !sentSelect || !db) return;
 
   let players = [];
   const names = {};
@@ -545,17 +545,61 @@ const incomingOptions = document.getElementById('incomingPlayerOptions');
         player.display_name || player.lichess_username || 'DYCHESS Player';
     });
 
-    addPlayerOptions(incomingSelect);
+    incomingOptions.replaceChildren();
+
+players.forEach(player => {
+  const playerNames = [
+    player.display_name,
+    player.lichess_username
+  ].filter(Boolean);
+
+  playerNames.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    incomingOptions.appendChild(option);
+  });
+});
     addPlayerOptions(sentSelect);
 
-    incomingSelect.addEventListener('change', () =>
-      loadChallenges(
-        incomingSelect,
-        incomingList,
-        'opponent_id',
-        'challenger_id'
-      )
+    incomingSearch.addEventListener('input', () => {
+  const typedName = incomingSearch.value.trim().toLowerCase();
+
+  const player = players.find(player =>
+    [player.display_name, player.lichess_username]
+      .filter(Boolean)
+      .some(name => name.toLowerCase() === typedName)
+  );
+
+  if (!player) {
+    showMessage(
+      incomingList,
+      typedName
+        ? 'Select or type a registered DYCHESS username.'
+        : 'Type your DYCHESS username to view incoming challenges.'
     );
+    return;
+  }
+
+  incomingSelectForSearch(player.id);
+});
+
+async function incomingSelectForSearch(playerId) {
+  showMessage(incomingList, 'Loading challenges...');
+
+  const { data, error } = await db
+    .from('arena_challenges')
+    .select('id, challenger_id, opponent_id, game_format, lichess_url, status, created_at')
+    .eq('opponent_id', playerId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Could not load incoming challenges:', error);
+    showMessage(incomingList, 'Could not load challenges. Please try again.');
+    return;
+  }
+
+  renderChallenges(incomingList, data || [], 'challenger_id');
+}
 
     sentSelect.addEventListener('change', () =>
       loadChallenges(

@@ -486,6 +486,24 @@ $("forgotPasswordBtn").addEventListener("click", async () => {
     button.textContent = "Update password";
   }
 });
+  $("signOutBtn").addEventListener("click", async () => {
+  const button = $("signOutBtn");
+  button.disabled = true;
+
+  try {
+    const { error } = await client.auth.signOut();
+
+    if (error) throw error;
+
+    await displaySession(null);
+    $("passwordResetPanel").classList.add("hidden");
+    showStatus("You have signed out of DYCHESS.");
+  } catch (error) {
+    showStatus(error.message || "Unable to sign out. Please try again.");
+  } finally {
+    button.disabled = false;
+  }
+});
    async function ensureAccountProfile(user) {
   const { data: existing, error } = await client
     .from("dychess_accounts")

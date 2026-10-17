@@ -142,17 +142,29 @@
   </p>
 
   <form id="arenaChallengeForm">
-    <label for="challengerSelect">Your DYCHESS username</label>
-    <select id="challengerSelect" required
-      style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
-      <option value="">Loading registered players...</option>
-    </select>
+    <label for="challengerSearch">Your DYCHESS username</label>
+   <input
+  id="challengerSearch"
+  type="text"
+  list="challengerOptions"
+  placeholder="Type your DYCHESS username to search"
+  autocomplete="off"
+  required
+  style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;"
+>
+<datalist id="challengerOptions"></datalist>
 
     <label for="opponentSelect">Choose your opponent</label>
-    <select id="opponentSelect" required
-      style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
-      <option value="">Select an opponent</option>
-    </select>
+  <input
+  id="opponentSearch"
+  type="text"
+  list="opponentOptions"
+  placeholder="Type your opponent's username to search"
+  autocomplete="off"
+  required
+  style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;"
+>
+<datalist id="opponentOptions"></datalist>
 
     <label for="arenaFormat">Game format</label>
     <select id="arenaFormat" required
@@ -227,102 +239,101 @@ window.dychessDB = window.supabase.createClient(
 );
 </script>
 
-<script>
-(async function loadArenaPlayers() {
-  const db = window.dychessDB;
-  const challengerSelect = document.getElementById('challengerSelect');
-  const opponentSelect = document.getElementById('opponentSelect');
-  const message = document.getElementById('arenaFormMessage');
 
-  try {
-    const { data, error } = await db
+<script>
+(function setupArenaSubmission() {
+  const form = document.getElementById('arenaChallengeForm');
+  const challengerSearch = document.getElementById('challengerSearch');
+  const opponentSearch = document.getElementById('opponentSearch');
+  const format = document.getElementById('arenaFormat');
+  const link = document.getElementById('arenaLichessUrl');
+  const message = document.getElementById('arenaFormMessage');
+  const button = form.querySelector('button[type="submit"]');
+
+  let players = [];
+
+  function playerName(player) {
+    return player.display_name || player.lichess_username || '';
+  }
+
+  function findPlayer(searchValue) {
+    const typedName = searchValue.trim().toLowerCase();
+
+    if (!typedName) return null;
+
+    return players.find(player =>
+      [player.display_name, player.lichess_username]
+        .filter(Boolean)
+        .some(name => name.toLowerCase() === typedName)
+    ) || null;
+  }
+
+  async function loadSearchOptions() {
+    const challengerOptions =
+      document.getElementById('challengerOptions');
+    const opponentOptions =
+      document.getElementById('opponentOptions');
+
+    const { data, error } = await window.dychessDB
       .from('players')
       .select('id, display_name, lichess_username')
       .order('display_name');
 
     if (error) throw error;
 
-    if (!data || data.length === 0) {
-      challengerSelect.innerHTML =
-        '<option value="">No registered players found</option>';
-      opponentSelect.innerHTML =
-        '<option value="">No registered players found</option>';
-      message.textContent = 'No registered DYCHESS players were found.';
-      return;
-    }
+    players = data || [];
 
-    const players = data.filter(player =>
-      player.display_name || player.lichess_username
-    );
-
-    function playerName(player) {
-      return player.display_name || player.lichess_username;
-    }
-
-    function fillSelect(select, placeholder) {
-      select.innerHTML = '';
-      const first = document.createElement('option');
-      first.value = '';
-      first.textContent = placeholder;
-      select.appendChild(first);
+    [challengerOptions, opponentOptions].forEach(list => {
+      list.replaceChildren();
 
       players.forEach(player => {
-        const option = document.createElement('option');
-        option.value = player.id;
-        option.textContent = playerName(player);
-        select.appendChild(option);
+        [player.display_name, player.lichess_username]
+          .filter(Boolean)
+          .forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            list.appendChild(option);
+          });
       });
-    }
-
-    fillSelect(challengerSelect, 'Choose your username');
-    fillSelect(opponentSelect, 'Choose an opponent');
-
-    challengerSelect.addEventListener('change', () => {
-      const selected = challengerSelect.value;
-      Array.from(opponentSelect.options).forEach(option => {
-        option.disabled = option.value !== '' && option.value === selected;
-      });
-
-      if (opponentSelect.value === selected) {
-        opponentSelect.value = '';
-      }
     });
-
-    message.textContent = 'Registered players loaded. Choose your players.';
-  } catch (error) {
-    console.error('Could not load Arena players:', error);
-    challengerSelect.innerHTML =
-      '<option value="">Could not load players</option>';
-    opponentSelect.innerHTML =
-      '<option value="">Could not load players</option>';
-    message.textContent =
-      'Could not load registered players. Please try again later.';
   }
-})();
-</script>
-<script>
-(function setupArenaSubmission() {
-  const form = document.getElementById('arenaChallengeForm');
-  const challenger = document.getElementById('challengerSelect');
-  const opponent = document.getElementById('opponentSelect');
-  const format = document.getElementById('arenaFormat');
-  const link = document.getElementById('arenaLichessUrl');
-  const message = document.getElementById('arenaFormMessage');
-  const button = form.querySelector('button[type="submit"]');
+
+  challengerSearch.addEventListener('input', () => {
+    const challenger = findPlayer(challengerSearch.value);
+    const opponent = findPlayer(opponentSearch.value);
+
+    if (challenger && opponent && challenger.id === opponent.id) {
+      message.textContent = 'You cannot challenge yourself.';
+    } else {
+      message.textContent = '';
+    }
+  });
+
+  opponentSearch.addEventListener('input', () => {
+    const challenger = findPlayer(challengerSearch.value);
+    const opponent = findPlayer(opponentSearch.value);
+
+    if (challenger && opponent && challenger.id === opponent.id) {
+      message.textContent = 'You cannot challenge yourself.';
+    } else {
+      message.textContent = '';
+    }
+  });
 
   form.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const challengerId = challenger.value;
-    const opponentId = opponent.value;
+    const challenger = findPlayer(challengerSearch.value);
+    const opponent = findPlayer(opponentSearch.value);
     const lichessUrl = link.value.trim();
 
-    if (!challengerId || !opponentId) {
-      message.textContent = 'Please select both players.';
+    if (!challenger || !opponent) {
+      message.textContent =
+        'Please type and select valid registered DYCHESS usernames.';
       return;
     }
 
-    if (challengerId === opponentId) {
+    if (challenger.id === opponent.id) {
       message.textContent = 'You cannot challenge yourself.';
       return;
     }
@@ -330,6 +341,7 @@ window.dychessDB = window.supabase.createClient(
     if (lichessUrl) {
       try {
         const parsedUrl = new URL(lichessUrl);
+
         if (
           parsedUrl.protocol !== 'https:' ||
           parsedUrl.hostname !== 'lichess.org'
@@ -351,8 +363,8 @@ window.dychessDB = window.supabase.createClient(
       const { error } = await window.dychessDB
         .from('arena_challenges')
         .insert({
-          challenger_id: challengerId,
-          opponent_id: opponentId,
+          challenger_id: challenger.id,
+          opponent_id: opponent.id,
           game_format: format.value,
           lichess_url: lichessUrl || null
         });
@@ -361,6 +373,8 @@ window.dychessDB = window.supabase.createClient(
 
       message.textContent =
         'Challenge submitted! Its status is Pending.';
+      challengerSearch.value = '';
+      opponentSearch.value = '';
       link.value = '';
     } catch (error) {
       console.error('Challenge submission failed:', error);
@@ -369,6 +383,12 @@ window.dychessDB = window.supabase.createClient(
     } finally {
       button.disabled = false;
     }
+  });
+
+  loadSearchOptions().catch(error => {
+    console.error('Could not load Arena player suggestions:', error);
+    message.textContent =
+      'Could not load registered players. Please refresh and try again.';
   });
 })();
 </script>

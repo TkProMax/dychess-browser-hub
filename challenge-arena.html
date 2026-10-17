@@ -601,6 +601,7 @@ async function incomingSelectForSearch(playerId) {
     .from('arena_challenges')
     .select('id, challenger_id, opponent_id, game_format, lichess_url, status, created_at')
     .eq('opponent_id', playerId)
+    .in('status', ['pending', 'completed'])
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -641,6 +642,7 @@ async function loadSentChallenges(playerId) {
     .from('arena_challenges')
     .select('id, challenger_id, opponent_id, game_format, lichess_url, status, created_at')
     .eq('challenger_id', playerId)
+    .in('status', ['pending', 'completed'])
     .order('created_at', { ascending: false });
 
   if (error) {

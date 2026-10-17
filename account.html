@@ -304,127 +304,26 @@
   return existing || null;
 }
 
-    async function displaySession(user) {
-      if (!user) {
-        $("authPanel").classList.remove("hidden");
-        $("accountPanel").classList.add("hidden");
-        return;
-      }
+     try {
+    const profile = await ensureAccountProfile(user);
 
-      $("authPanel").classList.add("hidden");
-      $("accountPanel").classList.remove("hidden");
-      $("welcomeText").textContent = "Loading your account...";
-
-      try {
-        const profile = await ensureAccountProfile(user);
-        $("welcomeText").textContent =
-          "Signed in as " + profile.username;
-        showStatus("Your DYCHESS account is signed in.");
-      } catch (error) {
-        $("welcomeText").textContent =
-          "Your account is signed in, but its profile needs attention.";
-        showStatus(error.message);
-      }
+    if (profile) {
+      $("welcomeText").textContent =
+        "Signed in as " + profile.username;
+      showStatus("Your DYCHESS account is signed in.");
+    } else {
+      $("welcomeText").textContent =
+        "Your account is signed in, but your Lichess identity is not linked yet.";
+      showStatus(
+        "Next, connect your Lichess account to verify your DYCHESS username."
+      );
     }
-
-    $("accountForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (busy) return;
-
-      const email = $("email").value.trim();
-      const password = $("password").value;
-      const username = $("username").value.trim();
-
-      if (mode === "register" &&
-          !/^[A-Za-z0-9_]{3,30}$/.test(username)) {
-        showStatus(
-          "Use 3–30 characters for your username: letters, numbers, and underscores only."
-        );
-        return;
-      }
-
-      setBusy(true);
-      showStatus("");
-
-      try {
-        if (mode === "register") {
-          const { data, error } = await client.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                dychess_username: username
-              },
-              emailRedirectTo:
-                window.location.origin +
-                window.location.pathname
-            }
-          });
-
-          if (error) throw error;
-
-          if (data.session && data.user) {
-            await displaySession(data.user);
-          } else {
-            showStatus(
-              "Registration started! Check your email and click the " +
-              "confirmation link. Then return to this page and sign in. " +
-              "Your username will be set up after your first successful sign-in."
-            );
-          }
-        } else {
-          const { data, error } =
-            await client.auth.signInWithPassword({
-              email,
-              password
-            });
-
-          if (error) throw error;
-
-          if (data.user) {
-            await displaySession(data.user);
-          }
-        }
-      } catch (error) {
-        showStatus(error.message || "Something went wrong. Please try again.");
-      } finally {
-        setBusy(false);
-      }
-    });
-
-    $("signOutBtn").addEventListener("click", async () => {
-      $("signOutBtn").disabled = true;
-
-      try {
-        const { error } = await client.auth.signOut();
-        if (error) throw error;
-
-        $("accountPanel").classList.add("hidden");
-        $("authPanel").classList.remove("hidden");
-        $("password").value = "";
-        setMode("login");
-        showStatus("You have signed out of DYCHESS.");
-      } catch (error) {
-        showStatus(error.message || "Unable to sign out. Please try again.");
-      } finally {
-        $("signOutBtn").disabled = false;
-      }
-    });
-
-    client.auth.onAuthStateChange((event, session) => {
-      if (event === "INITIAL_SESSION" ||
-          event === "SIGNED_IN" ||
-          event === "SIGNED_OUT" ||
-          event === "USER_UPDATED") {
-        if (event === "SIGNED_OUT") {
-          $("accountPanel").classList.add("hidden");
-          $("authPanel").classList.remove("hidden");
-        } else if (session?.user) {
-          displaySession(session.user);
-        }
-      }
-    });
-
+  } catch (error) {
+    $("welcomeText").textContent =
+      "Your account is signed in, but its profile needs attention.";
+    showStatus(error.message || "Unable to load your profile.");
+  }
+}
     (async function initialize() {
       const { data, error } = await client.auth.getSession();
 

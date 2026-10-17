@@ -374,7 +374,8 @@ window.dychessDB = window.supabase.createClient(
 </script>
 <script>
 (async function setupArenaChallengeLists() {
-  const incomingSelect = document.getElementById('incomingPlayerSelect');
+const incomingSearch = document.getElementById('incomingPlayerSearch');
+const incomingOptions = document.getElementById('incomingPlayerOptions');
   const sentSelect = document.getElementById('sentPlayerSelect');
   const incomingList = document.getElementById('incomingChallengesList');
   const sentList = document.getElementById('sentChallengesList');

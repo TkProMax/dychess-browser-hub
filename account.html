@@ -363,8 +363,18 @@ async function createLichessPkce() {
   // A new profile must be created after server-side Lichess verification.
   return existing || null;
 }
+async function displaySession(user) {
+  if (!user) {
+    $("authPanel").classList.remove("hidden");
+    $("accountPanel").classList.add("hidden");
+    return;
+  }
 
-     try {
+  $("authPanel").classList.add("hidden");
+  $("accountPanel").classList.remove("hidden");
+  $("welcomeText").textContent = "Loading your account...";
+ 
+  try {
     const profile = await ensureAccountProfile(user);
 
     if (profile) {

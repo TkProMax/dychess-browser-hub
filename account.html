@@ -384,18 +384,101 @@ async function createLichessPkce() {
     showStatus(error.message || "Unable to load your profile.");
   }
 }
-    (async function initialize() {
-      const { data, error } = await client.auth.getSession();
+  async function handleLichessReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const returnedState = params.get("state");
 
-      if (error) {
-        showStatus("Unable to check your session. Please refresh the page.");
-        return;
-      }
+  if (!code && !returnedState) return false;
 
-      if (data.session?.user) {
-        await displaySession(data.session.user);
-      }
-    })();
+  const savedState = sessionStorage.getItem("dychess_lichess_state");
+  const verifier = sessionStorage.getItem("dychess_lichess_verifier");
+
+  sessionStorage.removeItem("dychess_lichess_state");
+  sessionStorage.removeItem("dychess_lichess_verifier");
+
+  if (!code || !returnedState || returnedState !== savedState || !verifier) {
+    showStatus("Lichess connection could not be verified. Please try again.");
+    return true;
+  }
+
+  showStatus("Lichess authorization received. Completing verification...");
+
+  try {
+    const response = await fetch("https://lichess.org/api/token", {
+      method: "POST",
+     headers: {
+  "Content-Type": "application/x-www-form-urlencoded"
+},
+body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        code_verifier: verifier,
+        client_id: LICHESS_CLIENT_ID,
+        redirect_uri: LICHESS_REDIRECT_URI
+     }).toString()
+    });
+
+    if (!response.ok) throw new Error("Lichess token exchange failed.");
+
+    const tokenData = await response.json();
+    if (!tokenData.access_token) throw new Error("Lichess did not return an access token.");
+
+    const { data } = await client.auth.getSession();
+    if (!data.session) {
+      throw new Error("Please sign in to DYCHESS again, then reconnect Lichess.");
+    }
+
+    const result = await client.functions.invoke("verify-lichess-account", {
+      body: { lichessAccessToken: tokenData.access_token }
+    });
+
+    if (result.error) throw result.error;
+    if (result.data?.error) throw new Error(result.data.error);
+
+    const { data: userData } = await client.auth.getUser();
+    if (userData.user) await displaySession(userData.user);
+
+    $("lichessStatus").textContent =
+      "Lichess verified: " + result.data.username;
+  } catch (error) {
+    showStatus(error.message || "Unable to complete Lichess verification.");
+  } finally {
+    window.history.replaceState({}, document.title, LICHESS_REDIRECT_URI);
+  }
+
+  return true;
+}
+    $("connectLichessBtn").addEventListener("click", async () => {
+  try {
+    await connectLichess();
+  } catch (error) {
+    showStatus(error.message || "Unable to start Lichess connection.");
+  }
+});
+
+(async function initialize() {
+  const returnedFromLichess = await handleLichessReturn();
+
+  if (returnedFromLichess) {
+    const { data } = await client.auth.getSession();
+    if (data.session?.user) {
+      await displaySession(data.session.user);
+    }
+    return;
+  }
+
+  const { data, error } = await client.auth.getSession();
+
+  if (error) {
+    showStatus("Unable to check your session. Please refresh the page.");
+    return;
+  }
+
+  if (data.session?.user) {
+    await displaySession(data.session.user);
+  }
+})();
   </script>
 </body>
 </html>

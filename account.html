@@ -189,7 +189,26 @@
             Create account
           </button>
         </form>
+<div id="passwordResetPanel" class="hidden">
+  <h2>Choose a new password</h2>
+  <p>Enter your new DYCHESS account password below.</p>
 
+  <form id="passwordResetForm">
+    <label for="newPassword">New password</label>
+    <input
+      id="newPassword"
+      type="password"
+      minlength="8"
+      autocomplete="new-password"
+      placeholder="At least 8 characters"
+      required
+    >
+
+    <button id="saveNewPasswordBtn" type="submit">
+      Update password
+    </button>
+  </form>
+</div>
         <p class="hint">
           Registration requires email confirmation. Your email is private.
           Never share your password with anyone.

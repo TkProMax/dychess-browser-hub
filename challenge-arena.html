@@ -180,10 +180,15 @@
 <section class="panel">
   <h2>📥 Incoming Challenges</h2>
   <label for="incomingPlayerSelect">Show challenges for</label>
-  <select id="incomingPlayerSelect"
-    style="display:block;width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;">
-    <option value="">Choose your DYCHESS username</option>
-  </select>
+  <input
+  id="incomingPlayerSearch"
+  type="text"
+  list="incomingPlayerOptions"
+  placeholder="Type your DYCHESS username to search"
+  autocomplete="off"
+  style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;border-radius:8px;background:#17251c;color:#f4f5ef;border:1px solid #d9b45b;"
+>
+<datalist id="incomingPlayerOptions"></datalist>
   <div id="incomingChallengesList" class="status">
     Select your username to view incoming challenges.
   </div>

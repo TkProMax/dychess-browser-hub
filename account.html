@@ -604,6 +604,17 @@ body: new URLSearchParams({
 });
 
 (async function initialize() {
+  const isPasswordRecovery =
+    window.location.hash.includes("type=recovery") ||
+    new URLSearchParams(window.location.search).get("type") === "recovery";
+
+  if (isPasswordRecovery) {
+    $("authPanel").classList.add("hidden");
+    $("passwordResetPanel").classList.remove("hidden");
+    showStatus("Enter a new password for your DYCHESS account.");
+    return;
+  }
+
   const returnedFromLichess = await handleLichessReturn();
 
   if (returnedFromLichess) {

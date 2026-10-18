@@ -460,9 +460,13 @@ $("accountForm").addEventListener("submit", async (event) => {
 
       if (error) throw error;
 
-      if (data.user) {
-        await displaySession(data.user);
-      }
+     if (data.user) {
+  await displaySession(data.user);
+
+  if (!returnToRequestedPage()) {
+    showStatus("Signed in successfully.");
+  }
+}
     }
   } catch (error) {
     showStatus(error.message || "Authentication failed. Please try again.");

@@ -489,8 +489,7 @@ await loadMessages();
         });
     }
 
-    nameInput.value =
-      localStorage.getItem("dychess_chat_display_name") || "";
+    nameInput.value = "DYCHESS";
 
     sendButton.addEventListener("click", sendMessage);
     refreshButton.addEventListener("click", loadMessages);

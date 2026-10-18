@@ -350,6 +350,17 @@ async function createLichessPkce() {
 
   window.location.href = "https://lichess.org/oauth?" + params.toString();
 }
+  function returnToRequestedPage() {
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get("next");
+
+  if (next === "challenge-arena.html") {
+    window.location.replace("challenge-arena.html");
+    return true;
+  }
+
+  return false;
+}
     const $ = (id) => document.getElementById(id);
 
     let mode = "register";

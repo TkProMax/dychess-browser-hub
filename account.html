@@ -441,16 +441,16 @@ $("accountForm").addEventListener("submit", async (event) => {
 
       if (error) throw error;
 
-      if (data.session && data.user) {
-        await displaySession(data.user);
-        showStatus(
-          "Account created. Next, connect your Lichess account to verify your identity."
-        );
-      } else {
-        showStatus(
-          "Registration received. Check your email to confirm your account before signing in."
-        );
-      }
+     if (data.session && data.user) {
+  await displaySession(data.user);
+  showStatus(
+    "Account created. Connect your Lichess account to verify your identity before entering Challenge Arena."
+  );
+} else {
+  showStatus(
+    "Registration received. Check your email to confirm your account before signing in."
+  );
+}
     } else {
       const { data, error } =
         await client.auth.signInWithPassword({

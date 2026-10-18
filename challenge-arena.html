@@ -693,7 +693,9 @@ async function incomingSelectForSearch(playerId) {
     return;
   }
 
-  renderChallenges(incomingList, data || [], 'challenger_id');
+  console.log('Incoming player ID:', playerId);
+console.log('Incoming challenge rows:', data);
+renderChallenges(incomingList, data || [], 'challenger_id');
 }
 
   sentSearch.addEventListener('input', () => {

@@ -393,9 +393,8 @@
       setStatus("Sending message...");
 
       try {
-        c    const { data: sessionData, error: sessionError } =
+         const { data: sessionData, error: sessionError } =
           await db.auth.getSession();
-
         if (sessionError || !sessionData.session) {
           throw new Error("Please sign in to your DYCHESS account before chatting.");
         }

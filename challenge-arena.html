@@ -340,6 +340,72 @@ if (arenaGate) {
       message.textContent = '';
     }
   });
+  const opponentSuggestions =
+  document.getElementById('opponentSuggestions');
+
+opponentSearch.addEventListener('input', () => {
+  const query = opponentSearch.value.trim().toLowerCase();
+
+  opponentSuggestions.replaceChildren();
+
+  if (query.length < 3) {
+    opponentSuggestions.style.display = 'none';
+    return;
+  }
+
+  const matches = [];
+  const seenPlayers = new Set();
+
+  players.forEach(player => {
+    const names = [
+      player.display_name,
+      player.lichess_username
+    ].filter(Boolean);
+
+    const matchedName = names.find(name =>
+      name.toLowerCase().includes(query)
+    );
+
+    if (matchedName && !seenPlayers.has(player.id)) {
+      seenPlayers.add(player.id);
+      matches.push({
+        id: player.id,
+        name: matchedName,
+        player
+      });
+    }
+  });
+
+  matches.slice(0, 10).forEach(match => {
+    const option = document.createElement('button');
+
+    option.type = 'button';
+    option.textContent = match.name;
+
+    option.style.cssText =
+      'display:block;width:100%;padding:12px;text-align:left;' +
+      'background:#17251c;color:#f4f5ef;border:0;' +
+      'border-bottom:1px solid #344638;cursor:pointer;' +
+      'font-size:16px;';
+
+    option.addEventListener('click', () => {
+      opponentSearch.value = match.name;
+      opponentSuggestions.style.display = 'none';
+
+      opponentSearch.dispatchEvent(
+        new Event('input', { bubbles: true })
+      );
+    });
+
+    opponentSuggestions.appendChild(option);
+  });
+
+  if (matches.length > 0) {
+    opponentSuggestions.style.display = 'block';
+  } else {
+    opponentSuggestions.style.display = 'none';
+  }
+});
 
   form.addEventListener('submit', async function(event) {
     event.preventDefault();

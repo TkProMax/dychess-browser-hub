@@ -630,7 +630,7 @@ async function displaySession(user) {
   }
 
   showStatus("Lichess authorization received. Completing verification...");
-
+let verificationSucceeded = false;
   try {
     const response = await fetch("https://lichess.org/api/token", {
       method: "POST",

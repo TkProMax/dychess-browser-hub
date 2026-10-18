@@ -395,6 +395,7 @@ opponentSearch.addEventListener('input', () => {
       opponentSearch.dispatchEvent(
         new Event('input', { bubbles: true })
       );
+    opponentSuggestions.style.display = 'none';
     });
 
     opponentSuggestions.appendChild(option);

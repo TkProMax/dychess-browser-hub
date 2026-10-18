@@ -671,8 +671,12 @@ body: new URLSearchParams({
     verificationSucceeded = true;
   } catch (error) {
     showStatus(error.message || "Unable to complete Lichess verification.");
-  } finally {
+ } finally {
     window.history.replaceState({}, document.title, LICHESS_REDIRECT_URI);
+  }
+
+  if (verificationSucceeded && returnToRequestedPage()) {
+    return true;
   }
 
   return true;

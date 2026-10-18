@@ -350,14 +350,26 @@ async function createLichessPkce() {
 
   window.location.href = "https://lichess.org/oauth?" + params.toString();
 }
-  function returnToRequestedPage() {
-  const params = new URLSearchParams(window.location.search);
-  const next = params.get("next");
+const accountParams = new URLSearchParams(window.location.search);
+
+if (accountParams.get("next") === "challenge-arena.html") {
+  sessionStorage.setItem(
+    "dychess_next_after_auth",
+    "challenge-arena.html"
+  );
+}
+
+function returnToRequestedPage() {
+  const next = sessionStorage.getItem("dychess_next_after_auth");
 
   if (next === "challenge-arena.html") {
+    sessionStorage.removeItem("dychess_next_after_auth");
     window.location.replace("challenge-arena.html");
     return true;
   }
+
+  return false;
+}
 
   return false;
 }

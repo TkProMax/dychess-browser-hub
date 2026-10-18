@@ -668,6 +668,7 @@ body: new URLSearchParams({
 
     $("lichessStatus").textContent =
       "Lichess verified: " + result.data.username;
+    verificationSucceeded = true;
   } catch (error) {
     showStatus(error.message || "Unable to complete Lichess verification.");
   } finally {

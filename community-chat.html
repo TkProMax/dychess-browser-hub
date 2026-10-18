@@ -393,11 +393,19 @@
       setStatus("Sending message...");
 
       try {
+        c    const { data: sessionData, error: sessionError } =
+          await db.auth.getSession();
+
+        if (sessionError || !sessionData.session) {
+          throw new Error("Please sign in to your DYCHESS account before chatting.");
+        }
+
         const response = await fetch(SEND_FUNCTION_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "apikey": SUPABASE_PUBLISHABLE_KEY
+            "apikey": SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": `Bearer ${sessionData.session.access_token}`
           },
           body: JSON.stringify({
             display_name: displayName,

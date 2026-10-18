@@ -239,6 +239,22 @@ window.dychessDB = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+
+const arenaGate = document.getElementById('arenaSubmissionGate');
+
+if (arenaGate) {
+  arenaGate.style.display = 'none';
+
+  window.dychessDB.auth.getSession().then(({ data, error }) => {
+    if (!error && data.session) {
+      arenaGate.style.display = '';
+    }
+  });
+
+  window.dychessDB.auth.onAuthStateChange((_event, session) => {
+    arenaGate.style.display = session ? '' : 'none';
+  });
+}
 </script>
 
 

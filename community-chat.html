@@ -212,47 +212,44 @@
     </div>
   </header>
 
-  <main>
-    <section class="panel">
-      <h2>Join the conversation</h2>
-      <p class="muted">
-        
-      </p>
+<main class="chat-layout">
+  <section class="panel chat-messages-panel">
+    <div class="chat-heading">
+      <h2>♟ DYCHESS Community</h2>
+      <p class="muted">Connect with the DYCHESS chess community.</p>
+    </div>
 
-     <input id="displayName" type="hidden" value="DYCHESS">
-
-      <label for="messageInput">Your message</label>
-      <textarea
-        id="messageInput"
-        maxlength="500"
-        placeholder="Write something for the DYCHESS community..."
-      ></textarea>
-
-      <div class="actions">
-        <button id="sendButton" class="primary" type="button">
-          Send message →
-        </button>
-        <button id="refreshButton" class="secondary" type="button">
-          Refresh messages
-        </button>
-      </div>
-
-      <div id="status" role="status" aria-live="polite"></div>
-
-      <div class="notice">
-        Keep the chat respectful. Avoid sharing passwords, private information, or abusive content.
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Community messages</h2>
+    <div id="messages" aria-live="polite">
       <p class="muted"></p>
-      <div id="messages" aria-live="polite">
-        <p class="muted"></p>
-      </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
+  <section class="panel chat-composer">
+    <input id="displayName" type="hidden" value="DYCHESS">
+
+    <label for="messageInput">Your message</label>
+    <textarea
+      id="messageInput"
+      maxlength="500"
+      placeholder="Write something for the DYCHESS community..."
+    ></textarea>
+
+    <div class="actions">
+      <button id="sendButton" class="primary" type="button">
+        Send message →
+      </button>
+      <button id="refreshButton" class="secondary" type="button">
+        Refresh messages
+      </button>
+    </div>
+
+    <div id="status" role="status" aria-live="polite"></div>
+
+    <div class="notice">
+      Keep the chat respectful. Avoid sharing passwords, private information, or abusive content.
+    </div>
+  </section>
+</main>
   <footer>
     © 2026 DYCHESS. Built for the community.
     <br><a href="index.html">Return to DYCHESS Hub</a>

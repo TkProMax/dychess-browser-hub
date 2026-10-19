@@ -1077,8 +1077,8 @@ async function loadKnockoutBracket() {
     const { data: matches, error: matchError } = await db
       .from('arena_tournament_matches')
       .select(
-        'id, round_number, match_number, player1_id, player2_id, winner_id, lichess_url, status'
-      )
+  'id, round_number, match_number, player1_id, player2_id, winner_id, lichess_url, status, submitted_by, submitted_winner_id, result_confirmed_by, result_disputed_by, result_dispute_reason'
+)
       .eq('tournament_id', tournament.id)
       .order('round_number')
       .order('match_number');

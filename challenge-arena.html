@@ -996,16 +996,26 @@ async function loadSentChallenges(playerId) {
     }
   });
 
-  async function initialise() {
+ let initialising = false;
+
+async function initialise() {
+  if (initialising) return;
+
+  initialising = true;
+
+  try {
     await checkAccess();
     await loadTournaments();
+  } finally {
+    initialising = false;
   }
+}
 
-  initialise();
+initialise();
 
-  db.auth.onAuthStateChange(() => {
-    setTimeout(initialise, 0);
-  });
+db.auth.onAuthStateChange(() => {
+  setTimeout(initialise, 0);
+});
 })();
 </script>
 </body>

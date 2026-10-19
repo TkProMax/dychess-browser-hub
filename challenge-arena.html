@@ -1136,6 +1136,9 @@ async function loadKnockoutBracket() {
               usernames[player.user_id] || 'Registered player'
             ])
           );
+            playerUsers = Object.fromEntries(
+            players.map(player => [player.id, player.user_id])
+          );
         }
       }
     }

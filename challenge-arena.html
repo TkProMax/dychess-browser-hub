@@ -223,8 +223,60 @@
 <datalist id="sentPlayerOptions"></datalist>
   <div id="sentChallengesList" class="status"></div>
 </section>
-    <section class="panel">
-      <h2>🏆 Recent Results</h2>
+
+<!-- DYCHESS Knockout Tournament -->
+<section class="panel" id="knockoutTournamentSection">
+  <h2>🏆 DYCHESS Knockout Tournament</h2>
+
+  <p class="muted">
+    Eight players. Three rounds. One champion.
+    Follow the road to the final!
+  </p>
+
+  <div id="knockoutAdminControls" hidden>
+    <h3>Admin Controls</h3>
+
+    <form id="knockoutCreateForm">
+      <label for="knockoutTournamentName">
+        Tournament Name
+      </label>
+      <input
+        id="knockoutTournamentName"
+        type="text"
+        maxlength="100"
+        placeholder="e.g. DYCHESS Knockout Cup"
+        required
+      >
+
+      <label for="knockoutTournamentDescription">
+        Description (optional)
+      </label>
+      <textarea
+        id="knockoutTournamentDescription"
+        maxlength="500"
+        placeholder="Tournament details..."
+      ></textarea>
+
+      <button type="submit">Create Tournament</button>
+    </form>
+
+    <p id="knockoutAdminMessage" role="status"></p>
+  </div>
+
+  <div id="knockoutTournamentList">
+    <p class="muted">Knockout tournaments will appear here.</p>
+  </div>
+
+  <div id="knockoutBracketArea"></div>
+</section>
+
+<section class="panel">
+  <h2>🏆 Recent Results</h2>
+  <div class="status">
+    Completed challenge results will appear here.
+  </div>
+</section>
+</main>
       <div class="status">
         Completed challenge results will appear here.
       </div>

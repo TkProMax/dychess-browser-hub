@@ -1353,6 +1353,79 @@ async function loadKnockoutBracket() {
             'Result disputed — awaiting admin review.';
           matchCard.appendChild(disputeNotice);
         }
+          if (
+          match.status === 'disputed' &&
+          isAdmin &&
+          isVerifiedMember
+        ) {
+          const adminLabel = document.createElement('label');
+          adminLabel.textContent = 'Admin: select the correct winner';
+          adminLabel.style.display = 'block';
+          matchCard.appendChild(adminLabel);
+
+          const adminWinnerSelect = document.createElement('select');
+          adminWinnerSelect.style.display = 'block';
+          adminWinnerSelect.style.margin = '8px 0';
+          adminWinnerSelect.style.padding = '10px';
+
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = 'Choose correct winner';
+          adminWinnerSelect.appendChild(placeholder);
+
+          for (const playerId of [
+            match.player1_id,
+            match.player2_id
+          ]) {
+            const option = document.createElement('option');
+            option.value = String(playerId);
+            option.textContent =
+              playerNames[playerId] || 'Registered player';
+            adminWinnerSelect.appendChild(option);
+          }
+
+          const resolveButton = document.createElement('button');
+          resolveButton.type = 'button';
+          resolveButton.textContent = 'Resolve Dispute';
+
+          resolveButton.addEventListener('click', async () => {
+            if (!adminWinnerSelect.value) {
+              alert('Please select the correct winner.');
+              return;
+            }
+
+            const confirmed = window.confirm(
+              'Resolve this dispute and record the selected winner?'
+            );
+
+            if (!confirmed) return;
+
+            resolveButton.disabled = true;
+
+            try {
+              const { data, error } = await db.rpc(
+                'record_arena_match_winner',
+                {
+                  p_match_id: match.id,
+                  p_winner_id: Number(adminWinnerSelect.value),
+                  p_lichess_url: null
+                }
+              );
+
+              if (error) throw error;
+
+              alert(data || 'Dispute resolved successfully.');
+              await loadKnockoutBracket();
+              await loadTournaments();
+            } catch (error) {
+              console.error('Could not resolve disputed match:', error);
+              alert(error.message || 'Could not resolve the dispute.');
+              resolveButton.disabled = false;
+            }
+          });
+
+          matchCard.appendChild(resolveButton);
+        }
         if (match.submitted_winner_id && !match.winner_id) {
   const proposed = document.createElement('p');
   proposed.textContent =

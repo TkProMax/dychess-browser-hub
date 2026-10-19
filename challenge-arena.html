@@ -793,6 +793,220 @@ async function loadSentChallenges(playerId) {
     showMessage(sentList, 'Could not load registered players.');
   }
 })();
+
+// ========================================
+// DYCHESS KNOCKOUT TOURNAMENT
+// ========================================
+(() => {
+  const db = window.dychessDB;
+
+  const tournamentList =
+    document.getElementById('knockoutTournamentList');
+  const adminControls =
+    document.getElementById('knockoutAdminControls');
+  const createForm =
+    document.getElementById('knockoutCreateForm');
+  const adminMessage =
+    document.getElementById('knockoutAdminMessage');
+
+  if (!db || !tournamentList || !createForm) return;
+
+  let currentUser = null;
+  let isVerifiedMember = false;
+  let isAdmin = false;
+
+  function message(text) {
+    if (adminMessage) adminMessage.textContent = text;
+  }
+
+  async function checkAccess() {
+    const { data, error } = await db.auth.getUser();
+
+    currentUser = !error ? data.user : null;
+    isVerifiedMember = false;
+    isAdmin = false;
+
+    if (currentUser) {
+      const { data: account } = await db
+        .from('dychess_accounts')
+        .select('id')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      isVerifiedMember = !!account;
+
+      if (isVerifiedMember) {
+        const { data: admin } = await db
+          .from('admin_users')
+          .select('user_id')
+          .eq('user_id', currentUser.id)
+          .maybeSingle();
+
+        isAdmin = !!admin;
+      }
+    }
+
+    adminControls.hidden = !isAdmin;
+  }
+
+  async function loadTournaments() {
+    tournamentList.textContent = 'Loading tournaments...';
+
+    const { data: tournaments, error } = await db
+      .from('arena_tournaments')
+      .select('id, name, description, status, max_players, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Could not load knockout tournaments:', error);
+      tournamentList.textContent =
+        'Could not load tournaments. Please refresh the page.';
+      return;
+    }
+
+    tournamentList.replaceChildren();
+
+    if (!tournaments || tournaments.length === 0) {
+      tournamentList.textContent =
+        'No knockout tournaments yet. Check back soon!';
+      return;
+    }
+
+    for (const tournament of tournaments) {
+      const { count, error: countError } = await db
+        .from('arena_tournament_players')
+        .select('id', { count: 'exact', head: true })
+        .eq('tournament_id', tournament.id);
+
+      const card = document.createElement('div');
+      card.className = 'status';
+      card.style.marginTop = '16px';
+
+      const heading = document.createElement('h3');
+      heading.textContent = tournament.name;
+      card.appendChild(heading);
+
+      if (tournament.description) {
+        const description = document.createElement('p');
+        description.textContent = tournament.description;
+        card.appendChild(description);
+      }
+
+      const countText = document.createElement('p');
+      countText.textContent = countError
+        ? 'Registered players: count unavailable'
+        : `Registered players: ${count || 0}/8`;
+      card.appendChild(countText);
+
+      const statusText = document.createElement('p');
+      statusText.textContent =
+        'Status: ' + tournament.status.replaceAll('_', ' ');
+      card.appendChild(statusText);
+
+      if (
+        tournament.status === 'registration' &&
+        isVerifiedMember
+      ) {
+        const joinButton = document.createElement('button');
+        joinButton.type = 'button';
+        joinButton.textContent = 'Join Tournament';
+
+        joinButton.addEventListener('click', async () => {
+          joinButton.disabled = true;
+          joinButton.textContent = 'Joining...';
+
+          const { data, error } = await db.rpc(
+            'join_arena_tournament',
+            { p_tournament_id: tournament.id }
+          );
+
+          if (error) {
+            alert(error.message);
+          } else {
+            alert(data || 'Registration successful!');
+          }
+
+          await loadTournaments();
+        });
+
+        card.appendChild(joinButton);
+      } else if (
+        tournament.status === 'registration' &&
+        !currentUser
+      ) {
+        const signInText = document.createElement('p');
+        signInText.textContent =
+          'Sign in to your verified DYCHESS account to join.';
+        card.appendChild(signInText);
+      }
+
+      tournamentList.appendChild(card);
+    }
+  }
+
+  createForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    await checkAccess();
+
+    if (!isAdmin || !isVerifiedMember) {
+      message('Only verified DYCHESS admins can create tournaments.');
+      return;
+    }
+
+    const nameInput =
+      document.getElementById('knockoutTournamentName');
+    const descriptionInput =
+      document.getElementById('knockoutTournamentDescription');
+
+    const name = nameInput.value.trim();
+    const description = descriptionInput.value.trim();
+
+    if (!name) {
+      message('Please enter a tournament name.');
+      return;
+    }
+
+    const submitButton = createForm.querySelector(
+      'button[type="submit"]'
+    );
+
+    submitButton.disabled = true;
+    message('Creating tournament...');
+
+    try {
+      const { error } = await db.rpc(
+        'create_arena_tournament',
+        {
+          p_name: name,
+          p_description: description || null
+        }
+      );
+
+      if (error) throw error;
+
+      createForm.reset();
+      message('Tournament created successfully!');
+      await loadTournaments();
+    } catch (error) {
+      console.error('Tournament creation failed:', error);
+      message(error.message || 'Could not create tournament.');
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+  async function initialise() {
+    await checkAccess();
+    await loadTournaments();
+  }
+
+  initialise();
+
+  db.auth.onAuthStateChange(() => {
+    setTimeout(initialise, 0);
+  });
+})();
 </script>
 </body>
 </html>

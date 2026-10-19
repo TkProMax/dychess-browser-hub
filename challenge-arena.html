@@ -902,6 +902,44 @@ async function loadSentChallenges(playerId) {
       statusText.textContent =
         'Status: ' + tournament.status.replaceAll('_', ' ');
       card.appendChild(statusText);
+       if (
+        tournament.status === 'registration_closed' &&
+        isAdmin &&
+        isVerifiedMember
+      ) {
+        const startButton = document.createElement('button');
+        startButton.type = 'button';
+        startButton.textContent = 'Start Tournament';
+
+        startButton.addEventListener('click', async () => {
+          const confirmed = window.confirm(
+            'Start this knockout tournament and generate the quarter-final fixtures?'
+          );
+
+          if (!confirmed) return;
+
+          startButton.disabled = true;
+          startButton.textContent = 'Starting...';
+
+          try {
+            const { data, error } = await db.rpc(
+              'start_arena_tournament',
+              { p_tournament_id: tournament.id }
+            );
+
+            if (error) throw error;
+
+            alert(data || 'Tournament started successfully!');
+            await loadTournaments();
+          } catch (error) {
+            console.error('Could not start tournament:', error);
+            alert(error.message || 'Could not start tournament.');
+            await loadTournaments();
+          }
+        });
+
+        card.appendChild(startButton);
+      }
 
       if (
         tournament.status === 'registration' &&

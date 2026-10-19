@@ -403,20 +403,27 @@
       return card;
     }
 
-    function showMessages(items) {
-      messagesBox.replaceChildren();
+   
+function showMessages(items) {
+  messagesBox.replaceChildren();
 
-      if (!items || items.length === 0) {
-        const empty = document.createElement("p");
-        empty.className = "muted";
-        empty.textContent =
-          "No messages yet. Be the first to start the conversation!";
-        messagesBox.append(empty);
-        return;
-      }
+  if (!items || items.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent =
+      "No messages yet. Be the first to start the conversation!";
+    messagesBox.append(empty);
+  } else {
+    items.forEach(item => {
+      messagesBox.append(renderMessage(item));
+    });
+  }
 
-      items.forEach(item => messagesBox.append(renderMessage(item)));
-    }
+  // Automatically scroll to the newest message
+  requestAnimationFrame(() => {
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  });
+}
 
     async function loadMessages() {
       if (!db) return;

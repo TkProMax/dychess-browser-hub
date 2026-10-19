@@ -1384,6 +1384,7 @@ async function loadKnockoutBracket() {
               playerNames[playerId] || 'Registered player';
             adminWinnerSelect.appendChild(option);
           }
+          matchCard.appendChild(adminWinnerSelect);
 
           const resolveButton = document.createElement('button');
           resolveButton.type = 'button';

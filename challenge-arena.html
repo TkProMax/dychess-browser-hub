@@ -1033,7 +1033,172 @@ async function loadSentChallenges(playerId) {
       submitButton.disabled = false;
     }
   });
+async function loadKnockoutBracket() {
+  const area = document.getElementById('knockoutBracketArea');
 
+  if (!area) return;
+
+  area.replaceChildren();
+
+  const heading = document.createElement('h2');
+  heading.textContent = '🏆 DYCHESS CUP Bracket';
+  area.appendChild(heading);
+
+  const { data: tournaments, error } = await db
+    .from('arena_tournaments')
+    .select('id, name, status')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    area.textContent = 'Could not load the knockout bracket.';
+    console.error(error);
+    return;
+  }
+
+  if (!tournaments || tournaments.length === 0) {
+    area.append('No knockout tournaments available yet.');
+    return;
+  }
+
+  for (const tournament of tournaments) {
+    const section = document.createElement('div');
+    section.className = 'status';
+    section.style.marginTop = '16px';
+
+    const title = document.createElement('h3');
+    title.textContent = tournament.name;
+    section.appendChild(title);
+
+    const status = document.createElement('p');
+    status.textContent =
+      'Status: ' + tournament.status.replaceAll('_', ' ');
+    section.appendChild(status);
+
+    const { data: matches, error: matchError } = await db
+      .from('arena_tournament_matches')
+      .select(
+        'id, round_number, match_number, player1_id, player2_id, winner_id, lichess_url, status'
+      )
+      .eq('tournament_id', tournament.id)
+      .order('round_number')
+      .order('match_number');
+
+    if (matchError) {
+      section.append('Could not load matches.');
+      console.error(matchError);
+      area.appendChild(section);
+      continue;
+    }
+
+    if (!matches || matches.length === 0) {
+      section.append('Fixtures will appear here when the tournament starts.');
+      area.appendChild(section);
+      continue;
+    }
+
+    const playerIds = [
+      ...new Set(
+        matches
+          .flatMap(match => [match.player1_id, match.player2_id, match.winner_id])
+          .filter(id => id !== null)
+      )
+    ];
+
+    let playerNames = {};
+
+    if (playerIds.length > 0) {
+      const { data: players, error: playersError } = await db
+        .from('arena_tournament_players')
+        .select('id, user_id')
+        .eq('tournament_id', tournament.id)
+        .in('id', playerIds);
+
+      if (!playersError && players && players.length > 0) {
+        const userIds = [...new Set(players.map(player => player.user_id))];
+
+        const { data: accounts, error: accountsError } = await db
+          .from('dychess_accounts')
+          .select('id, username')
+          .in('id', userIds);
+
+        if (!accountsError && accounts) {
+          const usernames = Object.fromEntries(
+            accounts.map(account => [account.id, account.username])
+          );
+
+          playerNames = Object.fromEntries(
+            players.map(player => [
+              player.id,
+              usernames[player.user_id] || 'Registered player'
+            ])
+          );
+        }
+      }
+    }
+
+    const rounds = [
+      { number: 1, name: 'Quarter-finals' },
+      { number: 2, name: 'Semi-finals' },
+      { number: 3, name: 'Final' }
+    ];
+
+    for (const round of rounds) {
+      const roundMatches = matches.filter(
+        match => match.round_number === round.number
+      );
+
+      if (roundMatches.length === 0) continue;
+
+      const roundHeading = document.createElement('h4');
+      roundHeading.textContent = round.name;
+      section.appendChild(roundHeading);
+
+      for (const match of roundMatches) {
+        const matchCard = document.createElement('div');
+        matchCard.style.padding = '12px';
+        matchCard.style.margin = '10px 0';
+        matchCard.style.border = '1px solid #526344';
+        matchCard.style.borderRadius = '8px';
+
+        const matchTitle = document.createElement('strong');
+        matchTitle.textContent = `Match ${match.match_number}`;
+        matchCard.appendChild(matchTitle);
+
+        const playersText = document.createElement('p');
+        const player1 = playerNames[match.player1_id] || 'To be decided';
+        const player2 = playerNames[match.player2_id] || 'To be decided';
+        playersText.textContent = `${player1} vs ${player2}`;
+        matchCard.appendChild(playersText);
+
+        const matchStatus = document.createElement('p');
+        matchStatus.textContent =
+          'Result: ' + (match.status || 'pending').replaceAll('_', ' ');
+        matchCard.appendChild(matchStatus);
+
+        if (match.winner_id) {
+          const winnerText = document.createElement('p');
+          winnerText.textContent =
+            'Winner: ' +
+            (playerNames[match.winner_id] || 'Registered player');
+          matchCard.appendChild(winnerText);
+        }
+
+        if (match.lichess_url) {
+          const gameLink = document.createElement('a');
+          gameLink.href = match.lichess_url;
+          gameLink.target = '_blank';
+          gameLink.rel = 'noopener noreferrer';
+          gameLink.textContent = 'View Lichess game';
+          matchCard.appendChild(gameLink);
+        }
+
+        section.appendChild(matchCard);
+      }
+    }
+
+    area.appendChild(section);
+  }
+}
  let initialising = false;
 
 async function initialise() {
@@ -1043,7 +1208,8 @@ async function initialise() {
 
   try {
     await checkAccess();
-    await loadTournaments();
+  await loadTournaments();
+  await loadKnockoutBracket();
   } finally {
     initialising = false;
   }

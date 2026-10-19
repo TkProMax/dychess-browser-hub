@@ -1353,6 +1353,13 @@ async function loadKnockoutBracket() {
             'Result disputed — awaiting admin review.';
           matchCard.appendChild(disputeNotice);
         }
+        if (match.submitted_winner_id && !match.winner_id) {
+  const proposed = document.createElement('p');
+  proposed.textContent =
+    'Submitted winner: ' +
+    (playerNames[match.submitted_winner_id] || 'Registered player');
+  matchCard.appendChild(proposed);
+}
         section.appendChild(matchCard);
       }
     }

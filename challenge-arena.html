@@ -1198,7 +1198,161 @@ async function loadKnockoutBracket() {
           gameLink.textContent = 'View Lichess game';
           matchCard.appendChild(gameLink);
         }
+  const signedInPlayer1 =
+          signedInUserId &&
+          playerUsers[match.player1_id] === signedInUserId;
 
+        const signedInPlayer2 =
+          signedInUserId &&
+          playerUsers[match.player2_id] === signedInUserId;
+
+        const isMatchPlayer = signedInPlayer1 || signedInPlayer2;
+
+        if (
+          isMatchPlayer &&
+          !match.winner_id &&
+          !match.submitted_by &&
+          match.player1_id &&
+          match.player2_id
+        ) {
+          const winnerLabel = document.createElement('label');
+          winnerLabel.textContent = 'Select the winner:';
+          winnerLabel.style.display = 'block';
+          matchCard.appendChild(winnerLabel);
+
+          const winnerSelect = document.createElement('select');
+          winnerSelect.style.display = 'block';
+          winnerSelect.style.margin = '8px 0';
+          winnerSelect.style.padding = '10px';
+
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = 'Choose winner';
+          winnerSelect.appendChild(placeholder);
+
+          for (const playerId of [
+            match.player1_id,
+            match.player2_id
+          ]) {
+            const option = document.createElement('option');
+            option.value = String(playerId);
+            option.textContent =
+              playerNames[playerId] || 'Registered player';
+            winnerSelect.appendChild(option);
+          }
+
+          const submitResultButton = document.createElement('button');
+          submitResultButton.type = 'button';
+          submitResultButton.textContent = 'Submit Match Result';
+
+          submitResultButton.addEventListener('click', async () => {
+            if (!winnerSelect.value) {
+              alert('Please select the winner first.');
+              return;
+            }
+
+            submitResultButton.disabled = true;
+
+            try {
+              const { data, error } = await db.rpc(
+                'submit_arena_match_result',
+                {
+                  p_match_id: match.id,
+                  p_winner_id: Number(winnerSelect.value)
+                }
+              );
+
+              if (error) throw error;
+
+              alert(data || 'Result submitted successfully.');
+              await loadKnockoutBracket();
+            } catch (error) {
+              alert(error.message || 'Could not submit the result.');
+              submitResultButton.disabled = false;
+            }
+          });
+
+          matchCard.appendChild(submitResultButton);
+        }
+
+        if (
+          isMatchPlayer &&
+          match.status === 'awaiting_confirmation' &&
+          match.submitted_by &&
+          match.submitted_by !== signedInUserId &&
+          !match.result_disputed_by
+        ) {
+          const confirmButton = document.createElement('button');
+          confirmButton.type = 'button';
+          confirmButton.textContent = 'Confirm Result';
+
+          confirmButton.addEventListener('click', async () => {
+            if (!window.confirm('Do you agree with the submitted winner?')) {
+              return;
+            }
+
+            confirmButton.disabled = true;
+
+            try {
+              const { data, error } = await db.rpc(
+                'confirm_arena_match_result',
+                { p_match_id: match.id }
+              );
+
+              if (error) throw error;
+
+              alert(data || 'Result confirmed.');
+              await loadKnockoutBracket();
+              await loadTournaments();
+            } catch (error) {
+              alert(error.message || 'Could not confirm the result.');
+              confirmButton.disabled = false;
+            }
+          });
+
+          const disputeButton = document.createElement('button');
+          disputeButton.type = 'button';
+          disputeButton.textContent = 'Dispute Result';
+          disputeButton.style.marginLeft = '8px';
+
+          disputeButton.addEventListener('click', async () => {
+            const reason = window.prompt(
+              'Why are you disputing this result?'
+            );
+
+            if (reason === null) return;
+
+            disputeButton.disabled = true;
+
+            try {
+              const { data, error } = await db.rpc(
+                'dispute_arena_match_result',
+                {
+                  p_match_id: match.id,
+                  p_reason: reason
+                }
+              );
+
+              if (error) throw error;
+
+              alert(data || 'Result disputed.');
+              await loadKnockoutBracket();
+            } catch (error) {
+              alert(error.message || 'Could not dispute the result.');
+              disputeButton.disabled = false;
+            }
+          });
+
+          matchCard.appendChild(confirmButton);
+          matchCard.appendChild(disputeButton);
+        }
+
+        if (match.status === 'disputed') {
+          const disputeNotice = document.createElement('p');
+          disputeNotice.textContent =
+            'Result disputed — awaiting admin review.';
+          matchCard.appendChild(disputeNotice);
+        }
         section.appendChild(matchCard);
       }
     }

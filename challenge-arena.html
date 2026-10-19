@@ -1105,6 +1105,10 @@ async function loadKnockoutBracket() {
     ];
 
     let playerNames = {};
+    let playerUsers = {};
+
+    const { data: authData } = await db.auth.getUser();
+    const signedInUserId = authData?.user?.id || null;
 
     if (playerIds.length > 0) {
       const { data: players, error: playersError } = await db

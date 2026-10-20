@@ -484,7 +484,18 @@ $("accountForm").addEventListener("submit", async (event) => {
         }
       );
 
-      if (error) throw error;
+     if (error) {
+  let message = error.message;
+
+  try {
+    if (error.context) {
+      const response = await error.context.clone().json();
+      message = response.error || response.message || message;
+    }
+  } catch (ignored) {}
+
+  throw new Error(message);
+}
       if (data?.error) throw new Error(data.error);
 
       if (

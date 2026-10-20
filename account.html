@@ -463,53 +463,52 @@ $("accountForm").addEventListener("submit", async (event) => {
 
       if (error) throw error;
 
-     if (data.session && data.user) {
-  await displaySession(data.user);
-  showStatus(
-    "Account created. Connect your Lichess account to verify your identity before entering Challenge Arena."
-  );
-} else {
-  showStatus(
-    "Registration received. Check your email to confirm your account before signing in."
-  );
-}
-  } else {
-const { data, error } = await client.functions.invoke(
-"dychess-username-login",
-{
-body: {
-username: email,
-password
-}
-}
-);
+      if (data.session && data.user) {
+        await displaySession(data.user);
+        showStatus(
+          "Account created. Connect your Lichess account to verify your identity before entering Challenge Arena."
+        );
+      } else {
+        showStatus(
+          "Registration received. Check your email to confirm your account before signing in."
+        );
+      }
+    } else {
+      const { data, error } = await client.functions.invoke(
+        "dychess-username-login",
+        {
+          body: {
+            username: email,
+            password
+          }
+        }
+      );
 
-  if (error) throw error;
-  if (data?.error) throw new Error(data.error);
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-  if (
-    !data?.session?.access_token ||
-    !data?.session?.refresh_token
-  ) {
-    throw new Error("Login did not return a valid session.");
-  }
+      if (
+        !data?.session?.access_token ||
+        !data?.session?.refresh_token
+      ) {
+        throw new Error("Login did not return a valid session.");
+      }
 
-  const { data: sessionData, error: sessionError } =
-    await client.auth.setSession({
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token
-    });
+      const { data: sessionData, error: sessionError } =
+        await client.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token
+        });
 
-  if (sessionError) throw sessionError;
+      if (sessionError) throw sessionError;
 
-  if (sessionData.user) {
-    await displaySession(sessionData.user);
+      if (sessionData.user) {
+        await displaySession(sessionData.user);
 
-    if (!returnToRequestedPage()) {
-      showStatus("Signed in successfully.");
-    }
-  }
-}
+        if (!returnToRequestedPage()) {
+          showStatus("Signed in successfully.");
+        }
+      }
     }
   } catch (error) {
     showStatus(error.message || "Authentication failed. Please try again.");

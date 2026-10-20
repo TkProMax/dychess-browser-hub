@@ -1,1 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DYCHESS Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --green: #7fae3d;
+      --dark: #07140e;
+      --panel: #10251a;
+      --gold: #d9b45b;
+      --text: #f4f5ef;
+      --muted: #b8c4b9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
+      background: var(--dark);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+    .container { width: 100%; max-width: 480px; margin: 40px auto; }
+    .brand { text-align: center; margin-bottom: 24px; color: var(--gold); }
+    .brand h1 { margin: 0 0 8px; letter-spacing: 2px; }
+    .brand p { color: var(--muted); }
+    .panel {
+      background: var(--panel);
+      border: 1px solid #2b4533;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    label { display: block; margin: 16px 0 8px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #49604d;
+      border-radius: 8px;
+      background: #07140e;
+      color: white;
+      font-size: 16px;
+    }
+    button, .home-link {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--green);
+      color: #07140e;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    .home-link { background: transparent; border: 1px solid #49604d; color: var(--text); }
+    #status { color: var(--gold); overflow-wrap: anywhere; }
+    .small { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">
+      <h1>♞ DYCHESS ADMIN</h1>
+      <p>Secure administration portal</p>
+    </div>
 
+    <section class="panel">
+      <h2>Admin Login</h2>
+      <p class="small">Sign in using the existing authorized DYCHESS administrator account.</p>
+
+      <form id="adminLoginForm">
+        <label for="adminEmail">Admin email</label>
+        <input id="adminEmail" type="email" autocomplete="username" required>
+
+        <label for="adminPassword">Password</label>
+        <input id="adminPassword" type="password" autocomplete="current-password" required>
+
+        <button id="loginButton" type="submit">Sign In</button>
+      </form>
+
+      <p id="status" role="status" aria-live="polite"></p>
+      <a class="home-link" href="index.html">Back to DYCHESS Home</a>
+    </section>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://puogdezkkgcgaxyzofoe.supabase.co';
+
+    // Paste your existing Supabase anon/publishable key here.
+    const SUPABASE_ANON_KEY = 'sb_publishable_cKWMrNF-V40TZpdQp-ln6g_UvwbINQy';
+
+    const db = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    document.getElementById('adminLoginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      const status = document.getElementById('status');
+      const button = document.getElementById('loginButton');
+
+      button.disabled = true;
+      status.textContent = 'Signing in...';
+
+      try {
+        const { data, error } = await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+        if (!data.user) throw new Error('Login failed.');
+
+        const { data: admin, error: adminError } = await db
+          .from('admin_users')
+          .select('user_id')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (adminError) throw adminError;
+
+        if (!admin) {
+          await db.auth.signOut();
+          throw new Error('This account is not authorized as a DYCHESS admin.');
+        }
+
+        status.textContent = 'Admin identity verified. The management dashboard has not been connected yet.';
+      } catch (error) {
+        console.error('Admin login failed:', error);
+        status.textContent = error.message || 'Admin login failed.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

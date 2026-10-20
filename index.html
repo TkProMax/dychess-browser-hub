@@ -474,6 +474,56 @@ async function adminLogin(){
     alert(e.message || 'Admin login failed.');
   }
 }
+document.getElementById('newAdminLoginForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById('newAdminEmail').value.trim();
+  const password = document.getElementById('newAdminPassword').value;
+  const status = document.getElementById('newAdminLoginStatus');
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+
+  status.textContent = 'Signing in...';
+  button.disabled = true;
+
+  try {
+    const { data, error } = await window.dychessDB.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    const user = data?.user;
+    if (!user) throw new Error('Login failed.');
+
+    const { data: admin, error: adminError } = await window.dychessDB
+      .from('admin_users')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (adminError) throw adminError;
+
+    if (!admin) {
+      await window.dychessDB.auth.signOut();
+      throw new Error('This account is not authorized as a DYCHESS admin.');
+    }
+
+    await loadAdminTournaments();
+
+    document.getElementById('newAdminLoginPanel').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminResultsPanel').style.display = 'block';
+
+    status.textContent = '';
+    alert('DYCHESS Admin login successful.');
+  } catch (error) {
+    console.error('Admin login failed:', error);
+    status.textContent = error.message || 'Admin login failed.';
+  } finally {
+    button.disabled = false;
+  }
+});
 async function createTournament(){
   const name=document.getElementById('adminTournamentName').value.trim();
   const date=document.getElementById('adminTournamentDate').value;

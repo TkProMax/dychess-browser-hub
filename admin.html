@@ -135,7 +135,26 @@
           throw new Error('This account is not authorized as a DYCHESS admin.');
         }
 
-        status.textContent = 'Admin identity verified. The management dashboard has not been connected yet.';
+        status.textContent = 'Admin verified. Loading tournaments...';
+
+const { data: bridgeData, error: bridgeError } =
+  await db.functions.invoke('dychess-admin-bridge', {
+    body: { action: 'list_tournaments' }
+  });
+
+if (bridgeError) throw bridgeError;
+
+const tournaments = bridgeData?.data;
+
+if (!Array.isArray(tournaments)) {
+  throw new Error(
+    bridgeData?.error || 'Could not load tournaments from the original database.'
+  );
+}
+
+status.textContent =
+  `Admin verified. Loaded ${tournaments.length} tournaments from the original DYCHESS database.\n` +
+  tournaments.map(t => `${t.name || 'Untitled'} (ID ${t.id})`).join('\n');
       } catch (error) {
         console.error('Admin login failed:', error);
         status.textContent = error.message || 'Admin login failed.';

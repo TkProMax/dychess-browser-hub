@@ -404,6 +404,16 @@ function returnToRequestedPage() {
       );
 
       $("username").required = mode === "register";
+      $("emailLabel").textContent =
+  mode === "register" ? "Email address" : "DYCHESS username";
+
+$("email").type = mode === "register" ? "email" : "text";
+
+$("email").autocomplete =
+  mode === "register" ? "email" : "username";
+
+$("email").placeholder =
+  mode === "register" ? "you@example.com" : "Enter your DYCHESS username";
 
       $("registerTab").classList.toggle(
         "active", mode === "register"

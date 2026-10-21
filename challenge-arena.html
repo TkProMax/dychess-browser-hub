@@ -1080,11 +1080,10 @@ async function loadKnockoutBracket() {
 
     if (playerIds.length > 0) {
       const { data: players, error: playersError } = await db
-        .from('arena_tournament_players')
-        .select('id, user_id')
-        .eq('tournament_id', tournament.id)
-        .in('id', playerIds);
-
+  .from('arena_tournament_players')
+  .select('id, user_id, display_name')
+  .eq('tournament_id', tournament.id)
+  .in('id', playerIds);
       if (!playersError && players && players.length > 0) {
         const userIds = [...new Set(players.map(player => player.user_id))];
 

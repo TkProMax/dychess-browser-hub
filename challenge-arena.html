@@ -940,11 +940,9 @@ async function loadSentChallenges(playerId) {
 
         card.appendChild(startButton);
       }
-
-      if (
-        tournament.status === 'registration' &&
-        isVerifiedMember
-      ) {
+if (
+  tournament.status === 'registration'
+) {
         const joinButton = document.createElement('button');
         joinButton.type = 'button';
         joinButton.textContent = 'Join Tournament';

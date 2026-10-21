@@ -966,15 +966,7 @@ if (
         });
 
         card.appendChild(joinButton);
-      } else if (
-        tournament.status === 'registration' &&
-        !currentUser
-      ) {
-        const signInText = document.createElement('p');
-        signInText.textContent =
-          'Sign in to your verified DYCHESS account to join.';
-        card.appendChild(signInText);
-      }
+     
 
       tournamentList.appendChild(card);
     }

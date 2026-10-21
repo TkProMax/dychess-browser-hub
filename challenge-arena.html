@@ -819,31 +819,26 @@ async function loadSentChallenges(playerId) {
     if (adminMessage) adminMessage.textContent = text;
   }
 
-  async function checkAccess() {
-    const { data, error } = await db.auth.getUser();
+async function checkAccess() {
+  const { data, error } = await db.auth.getUser();
 
-    currentUser = !error ? data.user : null;
-    isVerifiedMember = false;
-    isAdmin = false;
+  currentUser = !error ? data.user : null;
+  isVerifiedMember = false;
+  isAdmin = false;
 
-    if (currentUser) {
-      const { data: account } = await db
-        .from('dychess_accounts')
-        .select('id')
-        .eq('id', currentUser.id)
-        .maybeSingle();
+  if (currentUser) {
+    const { data: admin } = await db
+      .from('admin_users')
+      .select('user_id')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
 
-      isVerifiedMember = !!account;
+    isAdmin = !!admin;
+    isVerifiedMember = isAdmin;
+  }
 
-      if (isVerifiedMember) {
-        const { data: admin } = await db
-          .from('admin_users')
-          .select('user_id')
-          .eq('user_id', currentUser.id)
-          .maybeSingle();
-
-        isAdmin = !!admin;
-      }
+  adminControls.hidden = !isAdmin;
+}
     }
 
     adminControls.hidden = !isAdmin;

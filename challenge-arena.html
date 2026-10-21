@@ -825,24 +825,7 @@ async function checkAccess() {
   currentUser = !error ? data.user : null;
   isVerifiedMember = false;
   isAdmin = false;
-
-  if (currentUser) {
-    const { data: admin } = await db
-      .from('admin_users')
-      .select('user_id')
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
-
-    isAdmin = !!admin;
-    isVerifiedMember = isAdmin;
-  }
-
-  adminControls.hidden = !isAdmin;
 }
-    }
-
-    adminControls.hidden = !isAdmin;
-  }
 
   async function loadTournaments() {
     tournamentList.textContent = 'Loading tournaments...';
